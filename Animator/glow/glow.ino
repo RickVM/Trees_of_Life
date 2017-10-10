@@ -22,7 +22,7 @@ FASTLED_USING_NAMESPACE
 #define FRAMES_PER_SECOND  1000
 #define FADER 60
 #define PULSEFADER 60
-#define FALL_FADER 5
+#define FALL_FADER 20
 
 //Pinout
 //Brown and blue
@@ -99,13 +99,15 @@ class Pulse {
         int waveParticle = (triwave8(currentPixel) * amplitudeFactor + 20);
         if (waveParticle > 0 && (x + currentPixel) < NUM_LEDS) {
           //Serial.println(waveParticle);
-          strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
+          if ((x + currentPixel) >= 0) {
+            strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
+          }
         }
       }
       //Serial.println("Secondwave");
       for (int i = tailWave, e = firstWaveSize; i >= 0; i--, currentPixel++, e -= 2) {
         int waveParticle = (triwave8(e) * amplitudeFactor + 20);
-        if (waveParticle > 0 && (x + currentPixel) < NUM_LEDS) {
+        if (waveParticle > 0 && (x + currentPixel) < NUM_LEDS && (x + currentPixel) >= 0) {
           //Serial.println(waveParticle);
           strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
         }
@@ -171,17 +173,14 @@ class Pulse {
       return true;
     }
     bool fall() {
-      if (pulseIndex < 0) {
+      if (pulseIndex < pulseIndex - (firstWave + secondWave)) { //Customized for sawtoothwave size!!
         return false;
       }
       else {
         SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
         SawToothWave(pulseIndex, secondWave, waveTail, secondWaveAmplitudeFactor);
       }
-      pulseDec -= fallSpeed;
-      pulseIndex = (int) pulseDec;
-      Serial.print("Pulse Index:\t");
-      Serial.println(pulseIndex);
+      pulseIndex -= fallSpeed;
       return true;
     }
 };
@@ -267,7 +266,7 @@ void loop() {
       valveBeat();
       break;
     case backward:
-      long loopTime = 7000;
+      long loopTime = 8000;
       long startTime = millis();
       while ((loopTime + startTime)  > millis()) {
         for (int i = 0; i < NUM_STRIPS; i++) {
