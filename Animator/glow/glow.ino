@@ -173,8 +173,9 @@ class Pulse {
       return true;
     }
     bool fall() {
-      if (pulseIndex < pulseIndex - (firstWave + secondWave)) { //Customized for sawtoothwave size!!
-        return false;
+      //Serial.println(pulseIndex <= (pulseIndex - (firstWave + secondWave + 1));
+      if (pulseIndex <= (0 - (firstWave + secondWave))) { //Customized for sawtoothwave size!!
+        return false; //finished collapsing
       }
       else {
         SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
