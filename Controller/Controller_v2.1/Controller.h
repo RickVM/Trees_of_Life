@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "Communication.h"
-
 #define BAUD_RATE 57600
 
 class Controller {
@@ -8,6 +7,7 @@ class Controller {
     Controller(void);
     void Begin();
     void Logic(uint32_t y);
+    void Logic1(uint8_t* y);
 
   private:
     //Objects
@@ -32,6 +32,7 @@ class Controller {
     void Flash(void);
 
     void setBooleans(uint32_t y);
+    void setBooleans1(uint8_t* y);
     void turnInputsOff(void);
     bool checkLetGo(void);
 

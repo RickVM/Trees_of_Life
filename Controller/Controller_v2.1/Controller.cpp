@@ -21,6 +21,7 @@ void Controller::Begin()
   this->turnInputsOff();
 }
 
+
 void Controller::Logic(uint32_t y)
 {
   //Set wich inputs are active as booleans in the memory
@@ -84,6 +85,68 @@ void Controller::Logic(uint32_t y)
   }
 }
 
+void Controller::Logic1(uint8_t* y)
+{
+  //Set wich inputs are active as booleans in the memory
+  setBooleans1(y);
+  if (syncingFailed)
+  {
+    this->LetGo();
+    delay(4000);
+    syncingFailed = false;
+    this->Reset();
+  }
+  else if (syncing)
+  {
+    //Check if somebody let go
+    if (this->checkLetGo())
+    {
+      this->syncing = false;
+      this->syncingFailed = true;
+      this->turnInputsOff();
+    }
+    else
+    {
+      this->syncTime = millis();
+      if (this->syncTime - this->oldSyncTime >= this->syncPreset)
+      {
+        //Sync completed
+        this->Flash();
+        this->Reset();
+        delay(12000);//12 seconds
+      }
+      else
+      {
+        //Put here the code for syncing
+        this->Pulse();
+      }
+    }
+  }
+  else if (x1 == true && x2 == true /*&& x3 == true
+           && x4 == true && x5 == true && x6 == true*/)//All active, do sync
+  {
+    this->syncing = true;
+    //Set pulse time the same
+    for (int i = 0; i < 6; i++)
+    {
+      this->pulseTime[i] = 1500;
+    }
+    this->oldSyncTime = millis();
+    this->Pulse();//Pulse to update old time values
+    //Calculate the difference here
+    this->calculateAdjustments();
+
+  }
+  else if (x1 == true || x2 == true || x3 == true
+           || x4 == true || x5 == true || x6 == true)
+  {
+    this->Pulse();
+  }
+  else
+  {
+    //Idle, do nothing
+  }
+}
 void Controller::calculateAdjustments(void)
 {
   Serial.print("The oldtime values are: ");
@@ -128,6 +191,19 @@ void Controller::setBooleans(uint32_t y)
   }
   if ((y & (1 << 5)) == 32) {
     this->x6 = true;
+  }
+}
+
+void Controller::setBooleans1(uint8_t* y)
+{
+  this->turnInputsOff();
+  int requiredDistance = 5;
+
+  if (y[0] > 0 && y[0] <= requiredDistance) {
+    this->x1 = true;
+  }
+  if (y[1] > 0 && y[1] <= requiredDistance) {
+    this->x2 = true;
   }
 }
 

@@ -1,15 +1,16 @@
 #include "Ultrasoon.h"
 
-Ultrasoon::Ultrasoon(uint8_t numInputs, uint8_t* trigPins, uint8_t* echoPins)
+Ultrasoon::Ultrasoon(uint8_t numInputs, uint8_t* trigPins, uint8_t* echoPins, uint8_t* distances)
 {
   this->numInputs = numInputs;
   this->trigPins = trigPins;
   this->echoPins = echoPins;
+  this->distances = distances;
 }
 
 void Ultrasoon::Begin(void)
 {
-  for (int i = 0; i < this->numinputs; i++)
+  for (int i = 0; i < this->numInputs; i++)
   {
     pinMode(this->trigPins[i], OUTPUT);
     pinMode(this->echoPins[i], INPUT);
@@ -18,7 +19,7 @@ void Ultrasoon::Begin(void)
 
 void Ultrasoon::PingDistance(void)
 {
-  int duration[numInputs], distance[numInputs];
+  int duration[numInputs];
   for (int i = 0 ; i < numInputs; i++) {
     digitalWrite(trigPins[i], LOW);
   }
@@ -31,23 +32,15 @@ void Ultrasoon::PingDistance(void)
   
   for (int i = 0 ; i < numInputs; i++) {
     digitalWrite(trigPins[i], LOW);
-    duration = pulseIn(echoPin, HIGH);
-    distance = (duration / 2) / 29.1;
+    duration[i] = pulseIn(echoPins[i], HIGH);
+    distances[i] = (duration[i] / 2) / 29.1;
   }
-
-
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration / 2) / 29.1;
-  //Sent out pings on all the sensors
-  //Wait for the return
-  //Read the distance from all of them
-  //Save the distance in a array
 }
 
-uint8_t Ultrasoon::ReadInput(void)
+uint8_t* Ultrasoon::ReadInputs(void)
 {
-  //Return an copy of an array of size six with ones and zeroes if the input is active or not
-  return 0;
+  PingDistance();
+  return distances;
 }
 
 
