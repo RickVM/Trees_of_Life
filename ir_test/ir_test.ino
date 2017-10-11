@@ -1,7 +1,7 @@
 #include <DistanceGP2Y0A21YK.h>
 
-#define trigPin 2
-#define echoPin 3
+#define trigPin 14
+#define echoPin 15
 #define led 13
 
 DistanceGP2Y0A21YK Dist;
