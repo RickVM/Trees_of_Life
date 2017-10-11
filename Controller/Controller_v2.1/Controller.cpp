@@ -19,6 +19,7 @@ void Controller::Begin()
   S2->Begin();
   S3->Begin();
   this->turnInputsOff();
+  this->Reset();
 }
 
 void Controller::Logic(uint32_t y)
@@ -100,12 +101,18 @@ void Controller::calculateAdjustments(void)
   Serial.print(adjustmentTimes[0]);
   Serial.print(", ");
   Serial.println(adjustmentTimes[1]);
-  adjustmentSteps[0] = adjustmentTimes[0] / 10;
-  adjustmentSteps[1] = adjustmentTimes[1] / 10;
+  adjustmentSteps[0] = adjustmentTimes[0] / 5;
+  adjustmentSteps[1] = adjustmentTimes[1] / 5;
   Serial.print("The adjustment steps are: ");
   Serial.print(adjustmentSteps[0]);
   Serial.print(", ");
   Serial.println(adjustmentSteps[1]);
+  pulseTime[0] += adjustmentSteps[0];
+  pulseTime[1] += adjustmentSteps[1];
+  Serial.print("The pulse times are: ");
+  Serial.print(pulseTime[0]);
+  Serial.print(", ");
+  Serial.println(pulseTime[1]);
 }
 
 void Controller::setBooleans(uint32_t y)
@@ -158,20 +165,22 @@ bool Controller::checkLetGo()
 void Controller::Pulse(void)//Two inputs at the moment
 {
   this->currentTime = millis();
+  long timeDifference = oldTime[0] - oldTime[1];
+  Serial.print("Old time difference: ");
+  Serial.println((oldTime[0] - oldTime[1]));
+  if(timeDifference < 20 && timeDifference > -20)
+  {
+    pulseTime[0] = 1500;
+    pulseTime[1] = 1500;
+    oldTime[0] += timeDifference;  
+  }
+ 
   if (x1)
   {
     if (this->currentTime - this->oldTime[0] > this->pulseTime[0])
     {
       S1->sendMessage("pulse");
-      this->oldTime[0] = this->currentTime + adjustmentSteps[0];
-      if (countTimes[0] == 10)
-      {
-        adjustmentSteps[0] = 0;
-      }
-      else
-      {
-        countTimes[0]++;
-      }
+      this->oldTime[0] = this->currentTime;
     }
   }
   if (x2)
@@ -179,15 +188,7 @@ void Controller::Pulse(void)//Two inputs at the moment
     if (this->currentTime - this->oldTime[1] > this->pulseTime[1])
     {
       S2->sendMessage("pulse");
-      this->oldTime[1] = this->currentTime + adjustmentSteps[1];
-      if (countTimes[1] == 10)
-      {
-        adjustmentSteps[1] = 0;
-      }
-      else
-      {
-        countTimes[1]++;
-      }
+      this->oldTime[1] = this->currentTime;
     }
   }
   if (x3)
@@ -218,11 +219,9 @@ void Controller::Reset(void)
 {
   for (int i = 0; i < 6; i++)
   {
-    countTimes[i] = 0;
     this->pulseTime[i] = 1500;
-
+    countSync[i] = 0;
   }
   this->syncing = false;
-
 }
 

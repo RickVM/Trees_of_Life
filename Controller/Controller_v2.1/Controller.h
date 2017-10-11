@@ -46,7 +46,8 @@ class Controller {
     void calculateAdjustments(void);
     long adjustmentTimes[6];
     long adjustmentSteps[6];
-    long countTimes[6];
+    int countSync[6];
     void Reset(void);
+
 };
 
