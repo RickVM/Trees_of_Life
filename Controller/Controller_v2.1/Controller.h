@@ -42,6 +42,11 @@ class Controller {
     long oldSyncTime;
     long syncPreset;
     long oldTimeSyncAdjust;
-    
+
+    void calculateAdjustments(void);
+    long adjustmentTimes[6];
+    long adjustmentSteps[6];
+    long countTimes[6];
+    void Reset(void);
 };
 

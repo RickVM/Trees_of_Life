@@ -30,6 +30,7 @@ void Controller::Logic(uint32_t y)
     this->LetGo();
     delay(4000);
     syncingFailed = false;
+    this->Reset();
   }
   else if (syncing)
   {
@@ -47,12 +48,8 @@ void Controller::Logic(uint32_t y)
       {
         //Sync completed
         this->Flash();
+        this->Reset();
         delay(12000);//12 seconds
-        this->syncing = false;
-        for (int i = 0; i < 6; i++)
-        {
-          this->pulseTime[i] = 1500;
-        }
       }
       else
       {
@@ -71,21 +68,11 @@ void Controller::Logic(uint32_t y)
       this->pulseTime[i] = 1500;
     }
     this->oldSyncTime = millis();
+    this->Pulse();//Pulse to update old time values
     //Calculate the difference here
-   /* long average = oldTime[0] + oldTime[1];
-    average /= 2;
-    long x = average - oldTime[0];
-    long y = average - oldTime[1];
-    pulseTime[0] += x;
-    pulseTime[1] += y;
-    Serial.print(x);
-    Serial.print(", ");
-    Serial.print(y);
-    Serial.print(", ");
-    Serial.print(pulseTime[0]);
-    Serial.print(", ");
-    Serial.println(pulseTime[1]);
-  */}
+    this->calculateAdjustments();
+
+  }
   else if (x1 == true || x2 == true || x3 == true
            || x4 == true || x5 == true || x6 == true)
   {
@@ -95,6 +82,30 @@ void Controller::Logic(uint32_t y)
   {
     //Idle, do nothing
   }
+}
+
+void Controller::calculateAdjustments(void)
+{
+  Serial.print("The oldtime values are: ");
+  Serial.print(oldTime[0]);
+  Serial.print(", ");
+  Serial.println(oldTime[1]);
+  long a = oldTime[0] + oldTime[1];
+  a /= 2;
+  Serial.print("Average : ");
+  Serial.println(a);
+  adjustmentTimes[0] = a - oldTime[0];
+  adjustmentTimes[1] = a - oldTime[1];
+  Serial.print("The adjustment times are: ");
+  Serial.print(adjustmentTimes[0]);
+  Serial.print(", ");
+  Serial.println(adjustmentTimes[1]);
+  adjustmentSteps[0] = adjustmentTimes[0] / 10;
+  adjustmentSteps[1] = adjustmentTimes[1] / 10;
+  Serial.print("The adjustment steps are: ");
+  Serial.print(adjustmentSteps[0]);
+  Serial.print(", ");
+  Serial.println(adjustmentSteps[1]);
 }
 
 void Controller::setBooleans(uint32_t y)
@@ -152,7 +163,15 @@ void Controller::Pulse(void)//Two inputs at the moment
     if (this->currentTime - this->oldTime[0] > this->pulseTime[0])
     {
       S1->sendMessage("pulse");
-      this->oldTime[0] = this->currentTime ;
+      this->oldTime[0] = this->currentTime + adjustmentSteps[0];
+      if (countTimes[0] == 10)
+      {
+        adjustmentSteps[0] = 0;
+      }
+      else
+      {
+        countTimes[0]++;
+      }
     }
   }
   if (x2)
@@ -160,7 +179,15 @@ void Controller::Pulse(void)//Two inputs at the moment
     if (this->currentTime - this->oldTime[1] > this->pulseTime[1])
     {
       S2->sendMessage("pulse");
-      this->oldTime[1] = this->currentTime;
+      this->oldTime[1] = this->currentTime + adjustmentSteps[1];
+      if (countTimes[1] == 10)
+      {
+        adjustmentSteps[1] = 0;
+      }
+      else
+      {
+        countTimes[1]++;
+      }
     }
   }
   if (x3)
@@ -185,5 +212,17 @@ void Controller::Flash(void)
   S1->sendMessage("flash");
   S2->sendMessage("flash");
   //S3->sendMessage("flash");
+}
+
+void Controller::Reset(void)
+{
+  for (int i = 0; i < 6; i++)
+  {
+    countTimes[i] = 0;
+    this->pulseTime[i] = 1500;
+
+  }
+  this->syncing = false;
+
 }
 
