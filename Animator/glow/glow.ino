@@ -45,15 +45,15 @@ const int stripPins[] {DATA0_PIN, DATA1_PIN, DATA2_PIN, DATA3_PIN};
 //Heartbeat pulse vars.
 //Used for old pulse 'tick' (line)
 const int hPulseSize = 5; //This number cannot be lower than pulseSpeed, otherwise the pulse will skip leds!
-const int pulseSpeed = 4; //Increasing this number makes the pulse go faster.
+const int pulseSpeed = 2; //Increasing this number makes the pulse go faster.
 const int r = 17; //Pulse colors
 const int g = 69;
 const int b = 223;
 const double fallSpeed = 4;
 //Used for new pulse (wavelike)
 int pulseHue = 172;
-const int firstWave = 60;
-const int secondWave =  60;
+const int firstWave = 40;
+const int secondWave =  40;
 const int waveTail = 20; //2/3 head, 1/3 tail
 const int firstWaveAmplitudeFactor = 2;
 const int secondWaveAmplitudeFactor = 1.3;

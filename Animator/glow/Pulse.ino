@@ -1,6 +1,7 @@
 //Deletes a pulse at the given index from the pulses list
 void deletePulses() {
-  for (int i = 0; i < Pulses.size(); i++) {
+  int Size = Pulses.size();
+  for (int i = 0; i < Size; i++) {
     deletePulse(0);
 
   }

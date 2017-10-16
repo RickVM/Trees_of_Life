@@ -18,8 +18,8 @@ Ultrasoon* ultrasoon;
 
 Controller* c;
 
-uint8_t inputsArray[NUM_INPUTS] = {14, 15};//Change the numbers, but DO NOT DELETE THIS ARRAY
-uint8_t triggerArray[NUM_INPUTS] = {16, 17};
+uint8_t inputsArray[NUM_INPUTS] = {15, 14};//Change the numbers, but DO NOT DELETE THIS ARRAY
+uint8_t triggerArray[NUM_INPUTS] = {17, 16};
 uint8_t distances[NUM_INPUTS]; //Put this in ultrasoon class later;
 //uint32_t _inputs;
 uint8_t* _inputs;

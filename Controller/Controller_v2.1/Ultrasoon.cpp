@@ -2,7 +2,7 @@
 
 Ultrasoon::Ultrasoon(uint8_t numInputs, uint8_t* trigPins, uint8_t* echoPins, uint8_t* distances)
 {
-  this->numInputs = numInputs;
+  this->numInputs = 1;
   this->trigPins = trigPins;
   this->echoPins = echoPins;
   this->distances = distances;

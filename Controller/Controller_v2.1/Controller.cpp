@@ -207,9 +207,11 @@ void Controller::setBooleans1(uint8_t* y)
   int requiredDistance = 5;
 
   if (y[0] > 0 && y[0] <= requiredDistance) {
+    Serial.println("Check1");
     this->x1 = true;
   }
   if (y[1] > 0 && y[1] <= requiredDistance) {
+        Serial.println("check2");
     this->x2 = true;
   }
 }
