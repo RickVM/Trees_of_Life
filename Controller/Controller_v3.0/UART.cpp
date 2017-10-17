@@ -1,34 +1,22 @@
 #include "UART.h"
 
-UART::UART(uint8_t port, uint32_t baudrate) : Communication()
+UART::UART(int baudrate) : Communication()
 {
   this->_baudRate = baudrate;
-  this->_port = port;
 }
 
 void UART::Begin()
 {
-  switch (this->_port) {
-    case 1:
-      Serial1.begin(this->_baudRate);
-      break;
-    case 2:
-      Serial2.begin(this->_baudRate);
-      break;
-    case 3:
-      Serial3.begin(this->_baudRate);
-      break;
-    default:
-      //Set error value, not inplemented yet
-      break;
-  }
+  Serial1.begin(this->_baudRate);
+  Serial2.begin(this->_baudRate);
+  Serial3.begin(this->_baudRate);
 }
 
 //Not needed for first prototype
-COMMANDS UART::readCommand()
+COMMANDS UART::readCommand(int id)
 {
   COMMANDS rv = error;
-  switch (this->_port) {
+  switch (id) {
     case 1:
       if (Serial1.available() > 0)
       {
@@ -42,7 +30,7 @@ COMMANDS UART::readCommand()
         else if (_receivedChar == '@')//Received end of message
         {
           this->_command = false;
-          rv = checkProtocol();
+          rv = checkProtocol(msg);
         }
         else if (this->_command == true)
         {
@@ -51,8 +39,46 @@ COMMANDS UART::readCommand()
       }
       break;
     case 2:
+      if (Serial2.available() > 0)
+      {
+        this->_readByte = Serial2.read();
+        _receivedChar = (char)_readByte;
+        if (_receivedChar == '#') //Received start of message
+        {
+          this->_command = true;
+          msg = "";
+        }
+        else if (_receivedChar == '@')//Received end of message
+        {
+          this->_command = false;
+          rv = checkProtocol(msg);
+        }
+        else if (this->_command == true)
+        {
+          msg = msg + _receivedChar;
+        }
+      }
       break;
     case 3:
+      if (Serial3.available() > 0)
+      {
+        this->_readByte = Serial3.read();
+        _receivedChar = (char)_readByte;
+        if (_receivedChar == '#') //Received start of message
+        {
+          this->_command = true;
+          msg = "";
+        }
+        else if (_receivedChar == '@')//Received end of message
+        {
+          this->_command = false;
+          rv = checkProtocol(msg);
+        }
+        else if (this->_command == true)
+        {
+          msg = msg + _receivedChar;
+        }
+      }
       break;
     default:
       //Set error value, not inplemented yet
@@ -61,10 +87,10 @@ COMMANDS UART::readCommand()
   return rv;
 }
 
-int UART::sendCommand(String message)
+int UART::sendCommand(int id, String message)
 {
   int rv = 0;
-  switch (this->_port) {
+  switch (id) {
     case 1:
       Serial1.println(_format(message));
       break;

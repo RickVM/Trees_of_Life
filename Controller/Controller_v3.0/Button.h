@@ -16,7 +16,3 @@ class Button : public Input
     void readInputs();
 };
 
- virtual ~Input(void) {};
-    virtual void Begin() = 0;
-    virtual void readInputs() = 0;
-    

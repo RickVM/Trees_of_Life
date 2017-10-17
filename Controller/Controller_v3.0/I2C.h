@@ -1,17 +1,24 @@
 #pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include <Wire.h>
 #include "Communication.h"
+
+static String receivedMessage;
+static boolean received;
 
 class I2C : public Communication
 {
+  private:
+    int id;
+
   public:
-    I2C(void);
+    I2C(int id);
     ~I2C(void);
 
     void Begin();
-    COMMANDS readCommand();
-    int sendCommand(String message);
-
+    COMMANDS readCommand(int id);
+    int sendCommand(int id, String message);
+    static void receiveEvent(int howMany);
 };
 

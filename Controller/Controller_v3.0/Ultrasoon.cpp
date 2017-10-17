@@ -19,6 +19,7 @@ void Ultrasoon::Begin(void)
     pinMode(this->trigPins[i], OUTPUT);
     pinMode(this->echoPins[i], INPUT);
   }
+  this->setRequiredDistance(5);
 }
 
 void Ultrasoon::PingDistance(void)
@@ -28,16 +29,16 @@ void Ultrasoon::PingDistance(void)
     digitalWrite(trigPins[i], LOW);
   }
   delayMicroseconds(2); // Added this line
-  
+
   for (int i = 0 ; i < numInputs; i++) {
     digitalWrite(trigPins[i], HIGH);
   }
   delayMicroseconds(10); // Added this line
-  
+
   for (int i = 0 ; i < numInputs; i++) {
     digitalWrite(trigPins[i], LOW);
     duration[i] = pulseIn(echoPins[i], HIGH);
-    setInput(i,((duration[i] / 2) / 29.1));
+    setInput(i, ((duration[i] / 2) / 29.1));
   }
 }
 

@@ -1,27 +1,25 @@
 #include "Controller.h"
 
-Controller::Controller(Input* input, int comMethod, int numAnimators, int id)
+Controller::Controller(Input* input, int comMethod, int numAnimators)
 {
   this->_input = input;
   this->communicationMethod = comMethod;
   this->numberAnimators = numAnimators;
   this->syncPreset = 15000;
-  this->id = id;
 }
 
 void Controller::Begin()
 {
   switch (communicationMethod) {
     case 1://Serial
-      COM = new UART(BAUD_RATE);
+      S = new UART(BAUD_RATE);
+      S->Begin();
       break;
     case 2://I2C
-      COM = new I2C(this->id);
       break;
     default:
       break;
   };
-  COM->Begin();
   this->Reset();
 }
 
@@ -87,18 +85,14 @@ void Controller::Logic(void)
 
 void Controller::calculateAdjustments(void)
 {
-  long average = 0;
-  for (int i = 0; i < this->numberAnimators; i++)
-  {
-    average += oldTime[i];
-  }
-  average /= this->numberAnimators;
-  for (int k = 0; k < this->numberAnimators; k++)
-  {
-    adjustmentTimes[k] = average - oldTime[k];
-    adjustmentSteps[k] = adjustmentTimes[k] / 5;
-    pulseTime[k] += adjustmentSteps[k];
-  }
+  long a = oldTime[0] + oldTime[1];
+  a /= 2;
+  adjustmentTimes[0] = a - oldTime[0];
+  adjustmentTimes[1] = a - oldTime[1];
+  adjustmentSteps[0] = adjustmentTimes[0] / 5;
+  adjustmentSteps[1] = adjustmentTimes[1] / 5;
+  pulseTime[0] += adjustmentSteps[0];
+  pulseTime[1] += adjustmentSteps[1];
 }
 
 bool Controller::checkLetGo()
@@ -112,6 +106,9 @@ bool Controller::checkLetGo()
   return rv;
 }
 
+/*
+   Pulse if the boolean is active, keep track of the time between the pulses
+*/
 void Controller::Pulse(void)//Two inputs at the moment
 {
   this->currentTime = millis();
@@ -122,32 +119,49 @@ void Controller::Pulse(void)//Two inputs at the moment
     pulseTime[1] = 2500;
     oldTime[0] += timeDifference;
   }
-  for (int i = 0; i < this->numberAnimators; i++)
+  if (_input->getInputHigh(0))
   {
-    if (_input->getInputHigh(i))
+    if (this->currentTime - this->oldTime[0] > this->pulseTime[0])
     {
-      if (this->currentTime - this->oldTime[i] > this->pulseTime[i])
-      {
-        COM->sendCommand((i + 1), "pulse");
-        this->oldTime[i] = this->currentTime;
-      }
+      Serial.println("Pulse 1");
+      S->sendCommand(1, "pulse");
+      this->oldTime[0] = this->currentTime;
+    }
+  }
+  if (_input->getInputHigh(1))
+  {
+    if (this->currentTime - this->oldTime[1] > this->pulseTime[1])
+    {
+      Serial.println("Pulse 2");
+      S->sendCommand(2, "pulse");
+      this->oldTime[1] = this->currentTime;
+    }
+  }
+  if (_input->getInputHigh(2))
+  {
+    if (this->currentTime - this->oldTime[2] > this->pulseTime[2])
+    {
+      S->sendCommand(3, "pulse");
+      this->oldTime[2] = this->currentTime;
     }
   }
 }
 
 void Controller::LetGo(void)
 {
-  for (int i = 1; i <= this->numberAnimators; i++)
+  for(int i = 0; i < this->numberAnimators; i++)
   {
-    COM->sendCommand(i, "backward");
+  S->sendCommand(i, "backward");
   }
+  S->sendCommand(2, "backward");
+  //S->sendCommand(3, "backward");
 }
 
 void Controller::Flash(void)
 {
-  for (int i = 1; i <= this->numberAnimators; i++)
+  for (int i = 0; i < this->numberAnimators; i++)
   {
-    COM->sendCommand(i, "flash");
+    S->sendCommand(i, "flash");
   }
 }
 
@@ -162,5 +176,6 @@ void Controller::Reset(void)
   this->syncingFailed = false;
   this->syncTime = 0;
   this->oldSyncTime = 0;
+  this->oldTimeSyncAdjust = 0;
 }
 
