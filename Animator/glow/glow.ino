@@ -10,6 +10,7 @@
 #include <LinkedList.h>
 #include "FastLED.h"
 #include "Communication.h"
+#include "Pulse.h"
 
 //Program assumes all used led strips to contain the same properties as listed below.
 FASTLED_USING_NAMESPACE
@@ -36,39 +37,30 @@ FASTLED_USING_NAMESPACE
 //Communication
 #define BAUD_RATE 57600
 
+
+
 struct ledstrip {
   CRGB leds[NUM_LEDS];
-} strip1, strip2, strip3, strip4; //Change this when adjusting the nr of ledstrips!
-ledstrip* strips[] = {&strip1, &strip2, &strip3, &strip4}; //This also!
+} strip1, strip2; //Change this when adjusting the nr of ledstrips!
+ledstrip* strips[] = {&strip1, &strip2}; //This also!
 
 enum currentStates {
+  Rest,
   Pulsing,
   Synchronized,
   DeSync
 };
 currentStates currentState;
 
-const int stripPins[] {DATA0_PIN, DATA1_PIN, DATA2_PIN, DATA3_PIN};
-//Heartbeat pulse vars.
-//Used for old pulse 'tick' (line)
-const int hPulseSize = 5; //This number cannot be lower than pulseSpeed, otherwise the pulse will skip leds!
-const int pulseSpeed = 3; //2 //Increasing this number makes the pulse go faster.
-const int r = 17; //Pulse colors
-const int g = 69;
-const int b = 223;
-const double fallSpeed = 3;
-//Used for new pulse (wavelike)
-int pulseHue = 172;
-const int firstWave = 40;
-const int secondWave =  40;
-const int waveTail = 20; //2/3 head, 1/3 tail
-const int firstWaveAmplitudeFactor = 2;
-const int secondWaveAmplitudeFactor = 1.3;
-//Used for custom wave
-int bigWaveBrightness[] {5, 5, 10, 15, 20, 25, 30, 35, 40, 45, 52, 59, 68, 76, 85, 95, 100, 95, 60, 40, 30, 25, 20, 19, 18, 17, 16, 15, 14, 13, 10};
-const int waveSize = sizeof(bigWaveBrightness) / sizeof(bigWaveBrightness[0]);
-int smallWaveBrightness[waveSize];
-double smallWaveModifier = 0.5;
+const int stripPins[] {DATA0_PIN, DATA1_PIN};
+
+//Rest pulse vars
+const int restPulseHue = HUE_RED;
+long lastRandomRestPulseTime = 0;
+int randomRestPulseTime = 2000;
+
+//Pulse vars
+const int pulseHue = HUE_RED;
 
 //Beat Flash vars
 const int nrOfBeats = 4;
@@ -86,151 +78,38 @@ const int bigValveDelay = 450;
 //Communication
 Communication* S1;
 
-void cHue() {
-  if (pulseHue >= 250) {
-    pulseHue = 1;
-  }
-  pulseHue += 1;
-}
-
-class Pulse {
-  private:
-    ledstrip* strip;
-    int pulseIndex;
-    double pulseDec; //This allows us to more precisely control the fallspeed.
-
-    void SawToothWave(int x, int waveSize, int tailWave, int amplitudeFactor) {
-      int currentPixel;
-      int firstWaveSize = waveSize - tailWave;
-      for (currentPixel = 0; currentPixel < firstWaveSize; currentPixel++) {
-        if ((currentPixel + x) >= 0 && (currentPixel + x ) < NUM_LEDS) {
-          int waveParticle = (triwave8(currentPixel) * amplitudeFactor + 20);
-          
-          if (waveParticle > 0) {
-            strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
-          }
-        }
-      }
-      //Serial.println("Secondwave");
-      for (int i = tailWave, e = firstWaveSize; i >= 0; i--, currentPixel++, e -= 2) {
-        if ((currentPixel + x) >= 0 && (currentPixel + x ) < NUM_LEDS) {
-          int waveParticle = (triwave8(e) * amplitudeFactor + 20);
-          if (waveParticle > 0) {
-            strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
-          }
-        }
-      }
-    }
-
-  public:
-    Pulse(ledstrip * Strip) {
-      this->strip = Strip;
-      pulseIndex = 0 - (firstWave + secondWave); // in case of tickSawWave
-      //PulseeIndex = 0 - (waveSize * 2) in case of customwave;
-    }
-    bool tick() {
-      if ((pulseIndex + hPulseSize ) >= NUM_LEDS) {
-      }
-      else {
-        for ( int i = 0; i < hPulseSize; i ++) {
-          strip->leds[pulseIndex + i] = CHSV(pulseHue, 255, BRIGHTNESS);
-          //strip->leds[pulseIndex + i] = currentColour[0];
-        }
-        pulseIndex += pulseSpeed;
-        pulseDec = pulseIndex; //Inefficient to do this, but performance is good enough.
-      }
-      return true;
-    }
-    bool tickCustomWave() {
-      if (pulseIndex + (waveSize * 2) >= NUM_LEDS) {
-        //Do nothing
-      }
-      else {
-        int e;
-        Serial.println("Bigwave");
-        for (int i = 0; i < waveSize; i++, e++) {
-          Serial.print("LED:");
-          Serial.print(pulseIndex + i);
-          Serial.print("\t");
-          Serial.println(bigWaveBrightness[i]);
-          strip->leds[pulseIndex + i] = CHSV(pulseHue, 255, bigWaveBrightness[i]);
-        }
-        Serial.println("Smallwave");
-        for (int i = 0; i < waveSize; i++, e++) {
-          Serial.print("LED:");
-          Serial.print(pulseIndex + e);
-          Serial.print("\t");
-          Serial.println(bigWaveBrightness[i]);
-          strip->leds[pulseIndex + e] = CHSV(pulseHue, 255, smallWaveBrightness[i]);
-        }
-        pulseIndex += pulseSpeed;
-        pulseDec = pulseIndex; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
-      }
-      return true;
-    }
-    bool tickSawWave() {
-      if (pulseIndex >= NUM_LEDS) {
-        return false;
-      }
-      else {
-        SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
-        SawToothWave(pulseIndex, secondWave, waveTail, secondWaveAmplitudeFactor);
-        //sineWave(pulseIndex+waveSize+25, waveSize, 5);
-        pulseIndex += pulseSpeed;
-        pulseDec = pulseIndex; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
-      }
-      return true;
-    }
-    bool fall() {
-      //Serial.println(pulseIndex <= (pulseIndex - (firstWave + secondWave + 1));
-      if (pulseIndex <= (0 - (firstWave + secondWave))) { //Customized for sawtoothwave size!!
-        return false; //finished collapsing
-      }
-      else {
-        SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
-        SawToothWave(pulseIndex, secondWave, waveTail, secondWaveAmplitudeFactor);
-      }
-      pulseIndex -= fallSpeed;
-      return true;
-    }
-};
-
 LinkedList<Pulse *> Pulses;
-
-void resetStrips() {
-  for (int j = 0; j < NUM_STRIPS; j++) {
-    for (int i = 0; i < NUM_LEDS; i++) {
-      strips[j]->leds[i] = CRGB(0, 0, 0);
-    }
-  }
-  FastLED.setBrightness(BRIGHTNESS);
-}
-
-void fillStripWithColor() {
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int e = 0; e < NUM_LEDS; e++) {
-      strips[i]->leds[e] = CHSV(pulseHue, 255, 18);
-    }
-  }
-}
+LinkedList<Pulse *> RestPulses;
 
 void executeState() {
+  Serial.print("Executing state: \t");
   switch (currentState) {
+    case Rest:
+    Serial.println("Rest");
+      fakeRestPulse(); //For test purposes
+      doRestPulse();
+      break;
     case Pulsing:
-      for (int i = 0; i <= NUM_STRIPS; i++) {
+    Serial.println("Pulsing");
+      if (Pulses.size() == 0) {
+        currentState = Rest;
+        return;
+      }
+      for (int i = 0; i < NUM_STRIPS; i++) {
         fadeToBlackBy(strips[i]->leds, NUM_LEDS, FADER);
       }
-      cHue();
       doPulse();     //fillStripWithColor();
       FastLED.show();
       break;
     case Synchronized:
+    Serial.println("Synced");
       //flash state (flash)
       valveBeat();
       currentState = Pulsing;
       break;
 
     case DeSync:
+    Serial.println("Desync");
       long loopTime = 8000;
       long startTime = millis();
       while ((loopTime + startTime)  > millis()) {
@@ -252,8 +131,11 @@ void readInput() {
       //Do nothing
       break;
     case pulse:
-      //MAKE 1 PULSE FOR EACH STRIP
-      if (currentState == Pulsing) { //Only if in pulse state. When moving this to another file, dont forget to make currentState extern!
+      if (currentState == Rest) {
+        currentState = Pulsing;
+      }
+      if (currentState == Pulsing) { //Only if in pulse or rest state. When moving this to another file, dont forget to make currentState extern!
+        //MAKE 1 PULSE FOR EACH STRIP
         for (int i = 0; i < NUM_STRIPS; i++) {
           makePulse(i);
         }
@@ -274,35 +156,19 @@ void readInput() {
 void setup() {
   delay(3000); // 3 second delay for recovery
   FastLED.addLeds<LED_TYPE, DATA0_PIN, COLOR_ORDER>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  if (NUM_STRIPS > 1) {
-    FastLED.addLeds<LED_TYPE, DATA1_PIN, COLOR_ORDER>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-    if (NUM_STRIPS > 2) {
-      FastLED.addLeds<LED_TYPE, DATA2_PIN, COLOR_ORDER>(strips[2]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-      if (NUM_STRIPS > 3) {
-        FastLED.addLeds<LED_TYPE, DATA3_PIN, COLOR_ORDER>(strips[3]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-      }
-    }
-  }
+  FastLED.addLeds<LED_TYPE, DATA1_PIN, COLOR_ORDER>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+
+  //Set random seed
+  randomSeed(analogRead(0));
   //FastLED.setBrightness(BRIGHTNESS);
   Serial.begin(9600);
-  Serial.print("Wave size:");
-  Serial.println(waveSize);
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
   Pulses = LinkedList<Pulse*>();
+  RestPulses = LinkedList<Pulse*>();
   resetStrips();
   FastLED.show();
 
-  //Set up smallWave
-  for (int i = 0; i < waveSize; i++) {
-    smallWaveBrightness[i] = (bigWaveBrightness[i] * smallWaveModifier);
-    Serial.print("Smallwave Index:");
-    Serial.print(i);
-    Serial.print("\t");
-    Serial.print(smallWaveBrightness[i]);
-    Serial.print("Should be:\t");
-    Serial.println((bigWaveBrightness[i] * smallWaveModifier));
-  }
   //Communication
   S1 = new Communication(1, BAUD_RATE);
   S1->Begin();
@@ -311,6 +177,7 @@ void setup() {
 
 
 void loop() {
+  //cHue();
   readInput();
   executeState();
 };
