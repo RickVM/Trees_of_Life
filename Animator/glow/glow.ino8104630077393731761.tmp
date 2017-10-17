@@ -41,22 +41,21 @@ struct ledstrip {
 } strip1, strip2, strip3, strip4; //Change this when adjusting the nr of ledstrips!
 ledstrip* strips[] = {&strip1, &strip2, &strip3, &strip4}; //This also!
 
-enum currentStates {
-  Pulsing,
+enum currentState {
+  Pulse,
   Synchronized,
   DeSync
 };
-currentStates currentState;
 
 const int stripPins[] {DATA0_PIN, DATA1_PIN, DATA2_PIN, DATA3_PIN};
 //Heartbeat pulse vars.
 //Used for old pulse 'tick' (line)
 const int hPulseSize = 5; //This number cannot be lower than pulseSpeed, otherwise the pulse will skip leds!
-const int pulseSpeed = 3; //2 //Increasing this number makes the pulse go faster.
+const int pulseSpeed = 2; //Increasing this number makes the pulse go faster.
 const int r = 17; //Pulse colors
 const int g = 69;
 const int b = 223;
-const double fallSpeed = 3;
+const double fallSpeed = 4;
 //Used for new pulse (wavelike)
 int pulseHue = 172;
 const int firstWave = 40;
@@ -103,30 +102,28 @@ class Pulse {
       int currentPixel;
       int firstWaveSize = waveSize - tailWave;
       for (currentPixel = 0; currentPixel < firstWaveSize; currentPixel++) {
-        if ((currentPixel + x) >= 0 && (currentPixel + x ) < NUM_LEDS) {
-          int waveParticle = (triwave8(currentPixel) * amplitudeFactor + 20);
-          
-          if (waveParticle > 0) {
+        int waveParticle = (triwave8(currentPixel) * amplitudeFactor + 20);
+        if (waveParticle > 0 && (x + currentPixel) < NUM_LEDS) {
+          //Serial.println(waveParticle);
+          if ((x + currentPixel) >= 0) {
             strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
           }
         }
       }
       //Serial.println("Secondwave");
       for (int i = tailWave, e = firstWaveSize; i >= 0; i--, currentPixel++, e -= 2) {
-        if ((currentPixel + x) >= 0 && (currentPixel + x ) < NUM_LEDS) {
-          int waveParticle = (triwave8(e) * amplitudeFactor + 20);
-          if (waveParticle > 0) {
-            strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
-          }
+        int waveParticle = (triwave8(e) * amplitudeFactor + 20);
+        if (waveParticle > 0 && (x + currentPixel) < NUM_LEDS && (x + currentPixel) >= 0) {
+          //Serial.println(waveParticle);
+          strip->leds[x + currentPixel] = CHSV(pulseHue, 255, waveParticle);
         }
       }
     }
 
   public:
-    Pulse(ledstrip * Strip) {
+    Pulse(ledstrip* Strip) {
       this->strip = Strip;
-      pulseIndex = 0 - (firstWave + secondWave); // in case of tickSawWave
-      //PulseeIndex = 0 - (waveSize * 2) in case of customwave;
+      pulseIndex = 0;
     }
     bool tick() {
       if ((pulseIndex + hPulseSize ) >= NUM_LEDS) {
@@ -169,8 +166,8 @@ class Pulse {
       return true;
     }
     bool tickSawWave() {
-      if (pulseIndex >= NUM_LEDS) {
-        return false;
+      if ((pulseIndex + firstWave + secondWave) >= NUM_LEDS) {
+        //Do nothing
       }
       else {
         SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
@@ -196,80 +193,6 @@ class Pulse {
 };
 
 LinkedList<Pulse *> Pulses;
-
-void resetStrips() {
-  for (int j = 0; j < NUM_STRIPS; j++) {
-    for (int i = 0; i < NUM_LEDS; i++) {
-      strips[j]->leds[i] = CRGB(0, 0, 0);
-    }
-  }
-  FastLED.setBrightness(BRIGHTNESS);
-}
-
-void fillStripWithColor() {
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int e = 0; e < NUM_LEDS; e++) {
-      strips[i]->leds[e] = CHSV(pulseHue, 255, 18);
-    }
-  }
-}
-
-void executeState() {
-  switch (currentState) {
-    case Pulsing:
-      for (int i = 0; i <= NUM_STRIPS; i++) {
-        fadeToBlackBy(strips[i]->leds, NUM_LEDS, FADER);
-      }
-      cHue();
-      doPulse();     //fillStripWithColor();
-      FastLED.show();
-      break;
-    case Synchronized:
-      //flash state (flash)
-      valveBeat();
-      currentState = Pulsing;
-      break;
-
-    case DeSync:
-      long loopTime = 8000;
-      long startTime = millis();
-      while ((loopTime + startTime)  > millis()) {
-        for (int i = 0; i < NUM_STRIPS; i++) {
-          fadeToBlackBy(strips[i]->leds, NUM_LEDS, FALL_FADER);
-        }
-        collapsePulse(); //Gets all existing pulses from a list and collapses them.
-        FastLED.show();
-      }
-      currentState = Pulsing;
-      break;
-  }
-}
-
-void readInput() {
-  COMMANDS x = S1->readSerialPort();
-  switch (x) {
-    case error:
-      //Do nothing
-      break;
-    case pulse:
-      //MAKE 1 PULSE FOR EACH STRIP
-      if (currentState == Pulsing) { //Only if in pulse state. When moving this to another file, dont forget to make currentState extern!
-        for (int i = 0; i < NUM_STRIPS; i++) {
-          makePulse(i);
-        }
-      }
-      break;
-
-    case flash:
-      deletePulses();
-      currentState = Synchronized;
-      break;
-
-    case backward:
-      currentState = DeSync;
-      break;
-  }
-}
 
 void setup() {
   delay(3000); // 3 second delay for recovery
@@ -306,12 +229,94 @@ void setup() {
   //Communication
   S1 = new Communication(1, BAUD_RATE);
   S1->Begin();
-  currentState = Pulsing;
+  STATE = Pulse;
 }
 
+void resetStrips() {
+  for (int j = 0; j < NUM_STRIPS; j++) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      strips[j]->leds[i] = CRGB(0, 0, 0);
+    }
+  }
+  FastLED.setBrightness(BRIGHTNESS);
+}
 
-void loop() {
-  readInput();
-  executeState();
-};
+void fillStripWithColor() {
+  for (int i = 0; i < NUM_STRIPS; i++) {
+    for (int e = 0; e < NUM_LEDS; e++) {
+      strips[i]->leds[e] = CHSV(pulseHue, 255, 18);
+    }
+  }
+}
 
+void executeState() {
+  switch (currentState) {
+    case Pulse:
+      for (int i = 0; i <= NUM_STRIPS; i++) {
+        fadeToBlackBy(strips[i]->leds, NUM_LEDS, FADER);
+      }
+      cHue();
+      doPulse();     //fillStripWithColor();
+      FastLED.show();
+      break;
+    case Synchronized:
+      //flash state (flash)
+      valveBeat();
+      currentState = Pulse;
+      break;
+
+    case DeSync;
+      long loopTime = 8000;
+      long startTime = millis();
+      while ((loopTime + startTime)  > millis()) {
+        for (int i = 0; i < NUM_STRIPS; i++) {
+          fadeToBlackBy(strips[i]->leds, NUM_LEDS, FALL_FADER);
+        }
+        collapsePulse(); //Gets all existing pulses from a list and collapses them.
+        FastLED.show();
+      }
+      break;
+  }
+}
+
+void readInput() {
+  COMMANDS x = S1->readSerialPort();
+  switch (x) {
+    case error:
+      break;
+    case pulse:
+      //received Pulse
+      //MAKE 2 PULSES SPREAD OUT
+      if (currentState = Pulse) { //Only if in pulse state. When moving this to another file, dont forget to make currentState extern!
+        for (int i = 0; i < NUM_STRIPS; i++) {
+          makePulse(i);
+        }
+      }
+      break;
+
+    case flash:
+      deletePulses();
+      currentState = Synchronized;
+      break;
+
+    case backward:
+      currentState = DeSync;
+      break;
+  }
+
+  void loop() {
+    //normal pulseState (reset state)
+    readInput();
+    executeState();
+    /*case reset:
+      //normal pulseState (reset state)
+      for (int i = 0; i < NUM_STRIPS; i++) {
+        fadeToBlackBy(strips[i]->leds, NUM_LEDS, 255);
+      }
+      doPulse();
+      break;*/
+
+  };
+  FastLED.show();
+
+}
