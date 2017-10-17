@@ -130,7 +130,7 @@ void Controller::Logic1(uint8_t* y)
     //Set pulse time the same
     for (int i = 0; i < 6; i++)
     {
-      this->pulseTime[i] = 1500;
+      this->pulseTime[i] = 2500;
     }
     this->oldSyncTime = millis();
     this->Pulse();//Pulse to update old time values
@@ -150,32 +150,14 @@ void Controller::Logic1(uint8_t* y)
 }
 void Controller::calculateAdjustments(void)
 {
-  Serial.print("The oldtime values are: ");
-  Serial.print(oldTime[0]);
-  Serial.print(", ");
-  Serial.println(oldTime[1]);
   long a = oldTime[0] + oldTime[1];
   a /= 2;
-  Serial.print("Average : ");
-  Serial.println(a);
   adjustmentTimes[0] = a - oldTime[0];
   adjustmentTimes[1] = a - oldTime[1];
-  Serial.print("The adjustment times are: ");
-  Serial.print(adjustmentTimes[0]);
-  Serial.print(", ");
-  Serial.println(adjustmentTimes[1]);
   adjustmentSteps[0] = adjustmentTimes[0] / 5;
   adjustmentSteps[1] = adjustmentTimes[1] / 5;
-  Serial.print("The adjustment steps are: ");
-  Serial.print(adjustmentSteps[0]);
-  Serial.print(", ");
-  Serial.println(adjustmentSteps[1]);
   pulseTime[0] += adjustmentSteps[0];
   pulseTime[1] += adjustmentSteps[1];
-  Serial.print("The pulse times are: ");
-  Serial.print(pulseTime[0]);
-  Serial.print(", ");
-  Serial.println(pulseTime[1]);
 }
 
 void Controller::setBooleans(uint32_t y)
@@ -244,19 +226,17 @@ void Controller::Pulse(void)//Two inputs at the moment
 {
   this->currentTime = millis();
   long timeDifference = oldTime[0] - oldTime[1];
-  Serial.print("Old time difference: ");
-  Serial.println((oldTime[0] - oldTime[1]));
   if(timeDifference < 20 && timeDifference > -20)
   {
     pulseTime[0] = 1500;
     pulseTime[1] = 1500;
     oldTime[0] += timeDifference;  
   }
- 
   if (x1)
   {
     if (this->currentTime - this->oldTime[0] > this->pulseTime[0])
     {
+      Serial.println("Pulse 1");
       S1->sendMessage("pulse");
       this->oldTime[0] = this->currentTime;
     }
@@ -265,6 +245,7 @@ void Controller::Pulse(void)//Two inputs at the moment
   {
     if (this->currentTime - this->oldTime[1] > this->pulseTime[1])
     {
+      Serial.println("Pulse 2");
       S2->sendMessage("pulse");
       this->oldTime[1] = this->currentTime;
     }
@@ -297,7 +278,7 @@ void Controller::Reset(void)
 {
   for (int i = 0; i < 6; i++)
   {
-    this->pulseTime[i] = 1500;
+    this->pulseTime[i] = 2500;
     countSync[i] = 0;
   }
   this->syncing = false;

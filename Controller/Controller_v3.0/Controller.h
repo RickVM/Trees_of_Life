@@ -1,28 +1,23 @@
 #include <Arduino.h>
-#include "Communication.h"
+#include "UART.h"
+#include "input.h"
+
 #define BAUD_RATE 57600
 
 class Controller {
   public:
-    Controller(void);
+    Controller(Input* input);
     void Begin();
-    void Logic(uint32_t y);
-    void Logic1(uint8_t* y);
+    void Logic(void);
 
   private:
     //Objects
     Communication* S1;
     Communication* S2;
     Communication* S3;
-
-    boolean x1;
-    boolean x2;
-    boolean x3;
-    boolean x4;
-    boolean x5;
-    boolean x6;
-
-    long pulseTime[6] = {10000, 10000, 1500, 1500, 1500, 1500};
+    Input* _input;
+    
+    long pulseTime[6] = {2500, 2500, 2500, 2500, 2500, 2500};
     long currentTime;
     long oldTime[6] = {0, 0, 0, 0, 0, 0};
 
@@ -31,9 +26,6 @@ class Controller {
     void LetGo(void);
     void Flash(void);
 
-    void setBooleans(uint32_t y);
-    void setBooleans1(uint8_t* y);
-    void turnInputsOff(void);
     bool checkLetGo(void);
 
     boolean syncing;
