@@ -41,6 +41,7 @@ void setup() {
 
 void loop()
 {
+
   _inputs = input->readInputs();
   c->Logic(_inputs);
 }

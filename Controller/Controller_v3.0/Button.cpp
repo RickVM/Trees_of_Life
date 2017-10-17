@@ -15,6 +15,7 @@ Button::~Button()
 
 void Button::Begin()
 {
+  Serial.println("Button begin.");
   for (int i = 0; i < this->numInputs; i++)
   {
     pinMode(this->arrayinputs[i], INPUT_PULLUP);
@@ -23,6 +24,7 @@ void Button::Begin()
 
 void Button::readInputs()
 {
+  Serial.println("Button read inputs.");
   for (int i = 0; i <= this->numInputs; i++)
   {
     this->setInput(i, digitalRead(this->arrayinputs[i]));

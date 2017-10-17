@@ -19,7 +19,6 @@ void Controller::Begin()
 
 void Controller::Logic(void)
 {
-  
   if (syncingFailed)
   {
     this->LetGo();
@@ -118,6 +117,7 @@ void Controller::Pulse(void)//Two inputs at the moment
   {
     if (this->currentTime - this->oldTime[0] > this->pulseTime[0])
     {
+      Serial.println("Pulse 1");
       S1->sendCommand("pulse");
       this->oldTime[0] = this->currentTime;
     }
@@ -126,6 +126,7 @@ void Controller::Pulse(void)//Two inputs at the moment
   {
     if (this->currentTime - this->oldTime[1] > this->pulseTime[1])
     {
+      Serial.println("Pulse 2");
       S2->sendCommand("pulse");
       this->oldTime[1] = this->currentTime;
     }

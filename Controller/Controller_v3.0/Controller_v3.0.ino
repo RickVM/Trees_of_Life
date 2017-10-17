@@ -17,11 +17,11 @@ Input* input;
 Controller* c;
 
 //Input arrays
-uint8_t inputsArray[NUM_INPUTS] = {15, 14};//Change the numbers, but DO NOT DELETE THIS ARRAY
+uint8_t inputsArray[NUM_INPUTS] = {14, 15};//Change the numbers, but DO NOT DELETE THIS ARRAY
 uint8_t triggerArray[NUM_INPUTS] = {17, 16};
-uint8_t _inputs;
 
-void setup() {
+void setup() 
+{
   Serial.begin(9600);//Just for debugging.
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
@@ -33,7 +33,7 @@ void setup() {
       break;
     case 2:
       input = new Ultrasoon(NUM_INPUTS, triggerArray, inputsArray);
-      input->Begin();    
+      input->Begin();
       break;
   };
   c = new Controller(input);

@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "input.h"
+
 class Button : public Input
 {
   private:
@@ -14,3 +15,8 @@ class Button : public Input
     void Begin();
     void readInputs();
 };
+
+ virtual ~Input(void) {};
+    virtual void Begin() = 0;
+    virtual void readInputs() = 0;
+    
