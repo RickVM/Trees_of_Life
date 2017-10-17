@@ -8,22 +8,26 @@ String Communication::_format(String message)
   return temp;
 }
 
-COMMANDS Communication::checkProtocol()
+COMMANDS Communication::checkProtocol(String message)
 {
   COMMANDS rv = error;
-  if(msg == "pulse")
+  if(message == "pulse")
   {
     rv = pulse;
   }
-  else if(msg == "flash")
+  else if(message == "flash")
   {
     rv = flash;
   }
-  else if(msg == "backward")
+  else if(message == "backward")
   {
     rv = backward;
   }
-  msg = ""; 
+  else if(message == "rest")
+  {
+    rv = rest;
+  }
+  message = ""; 
   return rv; 
 }
 

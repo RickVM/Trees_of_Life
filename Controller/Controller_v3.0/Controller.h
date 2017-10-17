@@ -1,21 +1,24 @@
 #include <Arduino.h>
 #include "UART.h"
+#include "I2C.h"
 #include "input.h"
 
 #define BAUD_RATE 57600
 
 class Controller {
   public:
-    Controller(Input* input);
+    Controller(Input* input, int comMethod, int numAnimators, int id);
     void Begin();
     void Logic(void);
 
   private:
     //Objects
-    Communication* S1;
-    Communication* S2;
-    Communication* S3;
+    Communication* COM;
     Input* _input;
+    
+    int communicationMethod;
+    int numberAnimators;
+    int id;
     
     long pulseTime[6] = {2500, 2500, 2500, 2500, 2500, 2500};
     long currentTime;
@@ -34,8 +37,7 @@ class Controller {
     long syncTime;
     long oldSyncTime;
     long syncPreset;
-    long oldTimeSyncAdjust;
-
+   
     void calculateAdjustments(void);
     long adjustmentTimes[6];
     long adjustmentSteps[6];

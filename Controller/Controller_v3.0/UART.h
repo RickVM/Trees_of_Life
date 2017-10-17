@@ -7,14 +7,15 @@ class UART : public Communication
 {
   private:
     int _baudRate;
-    int _port;
+    bool _command;
+    String msg;
     int _readByte;
     char _receivedChar;
 
   public:
-    UART(uint8_t port, uint32_t baudrate);
+    UART(int baudrate);
     void Begin();
-    COMMANDS readCommand();
-    int sendCommand(String message);
+    COMMANDS readCommand(int id);
+    int sendCommand( int id, String message);
 };
 
