@@ -67,6 +67,15 @@ void fillStripWithColor() {
     }
   }
 }
+
+void fillStripWithColorTemp() {
+  for (int i = 0; i < NUM_STRIPS; i++) {
+    for (int e = 0; e < NUM_LEDS; e++) {
+      strips[i]->leds[e] = CHSV(pulseHue, 255, 255);
+    }
+  }
+}
+
 /*  Old animations
 
   void twinkle(ledstrip & strip) {

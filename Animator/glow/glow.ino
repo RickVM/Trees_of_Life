@@ -5,18 +5,20 @@
 
   Fastled library is used to control the leds. (google it)
   The following linked list library is used to keep a list of pulses https://github.com/ivanseidel/LinkedList
-*/
-#define ANIMATORNR 1;
 
+  Testing strips that are used are: ws2812 RGB strips.
+  The final strips that are used are: ws2811 GRB strips. (current prototype strip is 40 leds big);
+*/
 #include <LinkedList.h>
 #include "FastLED.h"
 #include "Communication.h"
 #include "Pulse.h"
 
+
+const int ID = 1;
+
 //Program assumes all used led strips to contain the same properties as listed below.
 FASTLED_USING_NAMESPACE
-#define LED_TYPE    WS2812
-#define COLOR_ORDER RGB
 #define NUM_LEDS  600
 
 //6m is 360, 7m is 420, 10M is 600
@@ -156,8 +158,14 @@ void readInput() {
 
 void setup() {
   delay(3000); // 3 second delay for recovery
-  FastLED.addLeds<LED_TYPE, DATA0_PIN, COLOR_ORDER>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA1_PIN, COLOR_ORDER>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  if (ID == 3) {
+    FastLED.addLeds<WS2811, DATA0_PIN, GRB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  }
+  else {
+    FastLED.addLeds<WS2812, DATA0_PIN, RGB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<WS2812, DATA1_PIN, RGB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  }
 
   //Set random seed
   randomSeed(analogRead(0));
@@ -167,16 +175,19 @@ void setup() {
   digitalWrite(LED, HIGH);
   Pulses = LinkedList<Pulse*>();
   RestPulses = LinkedList<Pulse*>();
-  
+
   resetStrips();
   FastLED.show();
 
   //Communication
-  
+
   S1 = new Communication(1, BAUD_RATE);
   S1->Begin();
   currentState = Pulsing;
   lastRestPulseTime = 0;
+  //fillStripWithColorTemp();
+  FastLED.show();
+  //delay(30000);
 }
 
 
