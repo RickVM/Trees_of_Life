@@ -5,7 +5,7 @@ Controller::Controller(Input* input, int comMethod, int numAnimators, int id)
   this->_input = input;
   this->communicationMethod = comMethod;
   this->numberAnimators = numAnimators;
-  this->syncPreset = 15000;
+  this->syncPreset = 25000;
   this->id = id;
 }
 
@@ -96,7 +96,7 @@ void Controller::calculateAdjustments(void)
   for (int k = 0; k < this->numberAnimators; k++)
   {
     adjustmentTimes[k] = average - oldTime[k];
-    adjustmentSteps[k] = adjustmentTimes[k] / 5;
+    adjustmentSteps[k] = adjustmentTimes[k] / 10;
     pulseTime[k] += adjustmentSteps[k];
   }
 }

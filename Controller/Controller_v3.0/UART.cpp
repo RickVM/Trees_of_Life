@@ -105,5 +105,7 @@ int UART::sendCommand(int id, String message)
       //Set error value, not inplemented yet
       break;
   }
+  Serial.print("Sended message to: ");
+  Serial.println(id);
   return rv;
 }

@@ -16,7 +16,7 @@ void setup() {
 }
 
 void loop() {
-  COMMANDS rv = COM->readCommand(1);
+  COMMANDS rv = COM->readCommand(ID);
   switch (rv)
   {
     case pulse:

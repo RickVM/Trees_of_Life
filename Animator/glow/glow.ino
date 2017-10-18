@@ -6,11 +6,12 @@
   Fastled library is used to control the leds. (google it)
   The following linked list library is used to keep a list of pulses https://github.com/ivanseidel/LinkedList
 */
-#define ANIMATORNR 1;
+#define ID 2
 
 #include <LinkedList.h>
 #include "FastLED.h"
-#include "Communication.h"
+#include "UART.h"
+#include "I2C.h"
 #include "Pulse.h"
 
 //Program assumes all used led strips to contain the same properties as listed below.
@@ -37,7 +38,7 @@ FASTLED_USING_NAMESPACE
 
 //Communication
 #define BAUD_RATE 57600
-
+#define COMMUNICATION_METHODE 2//1 for serial, 2 for I2C
 
 
 struct ledstrip {
@@ -77,7 +78,7 @@ const int smallValveDelay = 5;
 const int bigValveDelay = 450;
 
 //Communication
-Communication* S1;
+Communication* COM;
 
 LinkedList<Pulse *> Pulses;
 LinkedList<Pulse *> RestPulses;
@@ -126,7 +127,7 @@ void executeState() {
 }
 
 void readInput() {
-  COMMANDS x = S1->readSerialPort();
+  COMMANDS x = COM->readCommand(ID);
   switch (x) {
     case error:
       //Do nothing
@@ -157,7 +158,7 @@ void readInput() {
 void setup() {
   delay(3000); // 3 second delay for recovery
   FastLED.addLeds<LED_TYPE, DATA0_PIN, COLOR_ORDER>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA1_PIN, COLOR_ORDER>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA1_PIN, COLOR_ORDER>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
   //Set random seed
   randomSeed(analogRead(0));
@@ -167,14 +168,21 @@ void setup() {
   digitalWrite(LED, HIGH);
   Pulses = LinkedList<Pulse*>();
   RestPulses = LinkedList<Pulse*>();
-  
+
   resetStrips();
   FastLED.show();
 
   //Communication
+  switch (COMMUNICATION_METHODE) {
+    case 1:
+      COM = new UART(BAUD_RATE);
+      break;
+    case 2:
+      COM = new I2C(ID);
+      break;
+  };
+  COM->Begin();
   
-  S1 = new Communication(1, BAUD_RATE);
-  S1->Begin();
   currentState = Pulsing;
   lastRestPulseTime = 0;
 }
