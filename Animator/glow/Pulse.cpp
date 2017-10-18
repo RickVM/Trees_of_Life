@@ -1,12 +1,20 @@
 #include "Pulse.h"
 
-
+//Used for normal pulse
 Pulse::Pulse(CRGB * StripLeds, int Num_leds, int Hue) {
   this->leds = StripLeds;
   this->NUM_LEDS = Num_leds;
   this->hue = Hue;
   pulseIndex = 0 - (firstWave + secondWave); // in case of tickSawWave
-  //PulseeIndex = 0 - (waveSize * 2) in case of customwave;
+}
+
+//used for rest pulse
+Pulse::Pulse(CRGB* StripLeds, int Num_leds, int Hue, int customIndex) {
+  this->leds = StripLeds;
+  this->NUM_LEDS = Num_leds;
+  this->hue = Hue;
+  pulseIndex = customIndex;
+  startTime = millis();
 }
 
 bool Pulse::tick() {
@@ -80,8 +88,37 @@ bool Pulse::tickSawWave() {
   else {
     SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
     SawToothWave(pulseIndex, secondWave, waveTail, secondWaveAmplitudeFactor);
-    //sineWave(pulseIndex+waveSize+25, waveSize, 5);
+
     pulseIndex += pulseSpeed;
+    pulseDec = pulseIndex; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
+  }
+  return true;
+}
+
+
+bool Pulse::tickRestWave() {
+  Serial.print("Ticking rest wave: \t");
+  if (pulseIndex >= NUM_LEDS) {
+    Serial.println("index too high");
+    return false;
+  }
+  else {
+    Serial.println("Ticking rest pulse");
+    int currentTime = millis();
+    if (startTime + restpulseLifeTime > currentTime) {
+      for (int i = 0; i < restpulseSize; i++) {
+        if (pulseIndex + i < NUM_LEDS) {
+          leds[pulseIndex + i] = CHSV(restHue, 255, brightness);
+        }
+      }
+    }
+    else {
+      //Start fading
+      //But for now end
+      return false;
+    }
+
+    pulseIndex += restPulseSpeed;
     pulseDec = pulseIndex; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
   }
   return true;

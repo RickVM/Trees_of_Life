@@ -1,22 +1,30 @@
 void fakeRestPulse() { //For test purposes
   long currentTime = millis();
-  if (lastRandomRestPulseTime + randomRestPulseTime >= currentTime) {
-    lastRandomRestPulseTime = currentTime;
-    int strip = random(0, 1);
+  Serial.println("Checking if we should fake");
+  if (currentTime >= (lastRestPulseTime + RestPulseTime)) {
+    Serial.println("Faking a rest pulse");
+    lastRestPulseTime = currentTime;
+    int strip = random(0, 2);
     makeRestPulse(strip);
   }
 }
 
 void doRestPulse() {
   for (int i = 0; i < RestPulses.size(); i++) {
-    //if (restPulses.get(i)->
+    Serial.println("Doing a rest pulse");
+    if (RestPulses.get(i)->tickRestWave()) {
+    }
+    else {
+      deleteRestPulse(i);
+    }
   }
 }
 
 //Makes a new pulse for the strip
 void makeRestPulse(int strip) {
   Serial.println("Making a rest pulse");
-  Pulse * P = new Pulse(strips[strip]->leds, NUM_LEDS, restPulseHue);
+  int IndexNumber = random(0, NUM_LEDS);
+  Pulse * P = new Pulse(strips[strip]->leds, NUM_LEDS, restPulseHue, IndexNumber);
   RestPulses.add(P);
 }
 

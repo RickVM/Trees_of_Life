@@ -19,7 +19,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS  600
 
 //6m is 360, 7m is 420, 10M is 600
-#define BRIGHTNESS  200 //200
+#define BRIGHTNESS  125 //200
 #define FRAMES_PER_SECOND  1000
 #define FADER 60
 #define PULSEFADER 60
@@ -56,8 +56,8 @@ const int stripPins[] {DATA0_PIN, DATA1_PIN};
 
 //Rest pulse vars
 const int restPulseHue = HUE_RED;
-long lastRandomRestPulseTime = 0;
-int randomRestPulseTime = 2000;
+long lastRestPulseTime;
+const long RestPulseTime = 2000;
 
 //Pulse vars
 const int pulseHue = HUE_RED;
@@ -85,31 +85,31 @@ void executeState() {
   Serial.print("Executing state: \t");
   switch (currentState) {
     case Rest:
-    Serial.println("Rest");
+      Serial.println("Rest");
+      pulseFade();
       fakeRestPulse(); //For test purposes
       doRestPulse();
+      FastLED.show();
       break;
     case Pulsing:
-    Serial.println("Pulsing");
+      Serial.println("Pulsing");
       if (Pulses.size() == 0) {
         currentState = Rest;
         return;
       }
-      for (int i = 0; i < NUM_STRIPS; i++) {
-        fadeToBlackBy(strips[i]->leds, NUM_LEDS, FADER);
-      }
+      pulseFade();
       doPulse();     //fillStripWithColor();
       FastLED.show();
       break;
     case Synchronized:
-    Serial.println("Synced");
+      Serial.println("Synced");
       //flash state (flash)
       valveBeat();
       currentState = Pulsing;
       break;
 
     case DeSync:
-    Serial.println("Desync");
+      Serial.println("Desync");
       long loopTime = 8000;
       long startTime = millis();
       while ((loopTime + startTime)  > millis()) {
@@ -173,6 +173,7 @@ void setup() {
   S1 = new Communication(1, BAUD_RATE);
   S1->Begin();
   currentState = Pulsing;
+  lastRestPulseTime = 0;
 }
 
 

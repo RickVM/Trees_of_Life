@@ -1,5 +1,7 @@
-void randomPulse() {
-  
+void pulseFade() {
+  for (int i = 0; i < NUM_STRIPS; i++) {
+    fadeToBlackBy(strips[i]->leds, NUM_LEDS, FADER);
+  }
 }
 
 //Preps strip for beats, beats and resets strip
@@ -22,20 +24,20 @@ void valveBeat() {
 void beat() {
   Serial.println("Beating..");
   int b = 0;
-  int x = beatBrightness/beatFrames;
+  int x = beatBrightness / beatFrames;
 
   for (int i = 0; i < beatFrames; i++) {
     FastLED.setBrightness(b += x);
     FastLED.show();
     FastLED.delay(beatDelay);
   }
-  for (int i = 0; i < (beatFrames-1); i++) {
+  for (int i = 0; i < (beatFrames - 1); i++) {
     FastLED.setBrightness(b -= x);
     FastLED.show();
     FastLED.delay(beatDelay);
   }
   //Now do half so we dont turn the leds off but dim them
-  FastLED.setBrightness(b -= (x/2));
+  FastLED.setBrightness(b -= (x / 2));
   FastLED.show();
   FastLED.delay(beatDelay);
 }
@@ -66,8 +68,8 @@ void fillStripWithColor() {
   }
 }
 /*  Old animations
- * 
-void twinkle(ledstrip & strip) {
+
+  void twinkle(ledstrip & strip) {
   // random colored speckles that blink in and fade smoothly
 
   long Time = millis();
@@ -84,5 +86,5 @@ void twinkle(ledstrip & strip) {
     strip.leds[(pos + 1)].setRGB(rT, gT, bT);
     strip.leds[(pos - 1)].setRGB(rT, gT, bT);
   }
-}*/
+  }*/
 
