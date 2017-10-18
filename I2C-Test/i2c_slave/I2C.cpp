@@ -10,7 +10,7 @@ I2C::I2C(int id)
   this->id = id;
   receivedMessage = "";
   received = false;
-  Serial.begin(9600);
+  Serial.println("I2C made");
 }
 
 I2C::~I2C(void)
@@ -20,7 +20,7 @@ I2C::~I2C(void)
 
 void I2C::Begin()
 {
-  Wire.begin();
+  Wire.begin(id);
   Wire.onReceive(receiveEvent);
 }
 
@@ -29,6 +29,8 @@ COMMANDS I2C::readCommand(int id)
   COMMANDS rv = error;
   if (received)
   {
+    Serial.print("Message is at this moment: ");
+    Serial.println(receivedMessage);
     rv = checkProtocol(receivedMessage);
     received = false;
     receivedMessage = "";
@@ -42,13 +44,10 @@ int I2C::sendCommand(int id, String message)
   char _buffer[32];
   String temp = _format(message);
   temp.toCharArray(_buffer, 32);
+
   Wire.beginTransmission(id);
   Wire.write(_buffer);
   Wire.endTransmission();
-  Serial.print("Sending message: ");
-  Serial.print(temp);
-  Serial.print(" ,Sending to ");
-  Serial.println(id);
   return rv;
 }
 
