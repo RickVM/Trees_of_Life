@@ -23,11 +23,9 @@ void Input::setInput(int pos, int x)
   valueArray[pos] = x;
   if (x > 0 && x < requiredDistance) {
     highOrLowArray[pos] = true;
-    Serial.println("Button is true");
   }
   else if (x == 0) {
     highOrLowArray[pos] = false;
-    Serial.println("Button is false");
   } 
   classificationArray[pos] = 0;//Add classification code here.
 }

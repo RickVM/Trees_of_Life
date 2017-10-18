@@ -6,12 +6,13 @@
 #include "UART.h"
 #include "I2C.h"
 #include "Controller.h"
+#include <Arduino.h>
 
 //Defines
 #define INPUT_METHOD 1 // 1 for buttons, two for 
-#define COMMUNICATION_METHOD 1 // 1 for serial, 2 for i2c
-#define NUM_ANIMATORS 2
-#define NUM_INPUTS 2//Per controller
+#define COMMUNICATION_METHOD 2 // 1 for serial, 2 for i2c
+#define NUM_ANIMATORS 3
+#define NUM_INPUTS 3//Per controller
 #define ID 0
 
 //Objects
@@ -19,7 +20,7 @@ Input* input;
 Controller* c;
 
 //Input arrays
-uint8_t inputsArray[NUM_INPUTS] = {14, 15};//Change the numbers, but DO NOT DELETE THIS ARRAY
+uint8_t inputsArray[NUM_INPUTS] = {14, 15, 16};//Change the numbers, but DO NOT DELETE THIS ARRAY
 uint8_t triggerArray[NUM_INPUTS] = {17, 16};
 
 void setup()
@@ -45,5 +46,6 @@ void loop()
 {
   input->readInputs();
   c->Logic();
+  delay(1);
 }
 
