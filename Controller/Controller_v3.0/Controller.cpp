@@ -59,8 +59,8 @@ void Controller::Logic(void)
       }
     }
   }
-  else if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true /*&& _input->getInputHigh(2) == true
-           && _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, do sync
+  else if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
+           /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, do sync
   {
     this->syncing = true;
     //Set pulse time the same
@@ -104,8 +104,8 @@ void Controller::calculateAdjustments(void)
 bool Controller::checkLetGo()
 {
   bool rv = true;
-  if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true /*&& _input->getInputHigh(2) == true
-      && _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, nobody let go
+  if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
+      /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, nobody let go
   {
     rv = false;
   }
