@@ -9,7 +9,7 @@
   Testing strips that are used are: ws2812 RGB strips.
   The final strips that are used are: ws2811 GRB strips. (current prototype strip is 40 leds big);
 */
-#define ANIMATORNR 1;
+#define ID 3
 
 #include <LinkedList.h>
 #include "FastLED.h"
@@ -17,8 +17,6 @@
 #include "I2C.h"
 #include "Pulse.h"
 
-
-const int ID = 1;
 
 //Program assumes all used led strips to contain the same properties as listed below.
 FASTLED_USING_NAMESPACE
@@ -161,9 +159,14 @@ void readInput() {
 
 void setup() {
   delay(3000); // 3 second delay for recovery
-  FastLED.addLeds<LED_TYPE, DATA0_PIN, COLOR_ORDER>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA1_PIN, COLOR_ORDER>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-
+  if (ID == 3) {
+    FastLED.addLeds<WS2811, DATA0_PIN, GRB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  }
+  else {
+    FastLED.addLeds<WS2812, DATA0_PIN, RGB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<WS2812, DATA1_PIN, RGB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  }
   //Set random seed
   randomSeed(analogRead(0));
   //FastLED.setBrightness(BRIGHTNESS);
@@ -177,9 +180,15 @@ void setup() {
   FastLED.show();
 
   //Communication
-  
-  S1 = new Communication(1, BAUD_RATE);
-  S1->Begin();
+  switch (COMMUNICATION_METHODE) {
+    case 1:
+      COM = new UART(BAUD_RATE);
+      break;
+    case 2:
+      COM = new I2C(ID);
+      break;
+  };
+  COM->Begin();
   currentState = Pulsing;
   lastRestPulseTime = 0;
   //fillStripWithColorTemp();
@@ -194,24 +203,3 @@ void loop() {
   executeState();
 };
 
-
-#define ID 2
-
-  if (ID == 3) {
-    FastLED.addLeds<WS2811, DATA0_PIN, GRB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-    FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  }
-  else {
-    FastLED.addLeds<WS2812, DATA0_PIN, RGB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-    FastLED.addLeds<WS2812, DATA1_PIN, RGB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  }
-  switch (COMMUNICATION_METHODE) {
-    case 1:
-      COM = new UART(BAUD_RATE);
-      break;
-    case 2:
-      COM = new I2C(ID);
-      break;
-  };
-  COM->Begin();
-  
