@@ -1,19 +1,20 @@
 #include <DistanceGP2Y0A21YK.h>
 
 //Arduino
-/*
+
 #define echoPin0 3
 #define trigPin0 4
 #define echoPin1 5
 #define trigPin1 6
-*/
+#define DELAY 400
 
 //Teensy
+/*
 #define echoPin0 20
 #define trigPin0 21
 #define echoPin1 22
 #define trigPin1 23
-
+*/
 
 #define led 13
 
@@ -32,8 +33,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   printUs0();
-  printUs1();
-  delay(2000);
+  //printUs1();
+  delay(DELAY);
 }
 
 

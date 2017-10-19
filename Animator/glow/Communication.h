@@ -4,7 +4,9 @@
 
 enum COMMANDS {
   error,
-  pulse,
+  pulse1,
+  pulse2,
+  pulse3,
   flash,
   backward,
   rest

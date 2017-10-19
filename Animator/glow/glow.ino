@@ -9,7 +9,32 @@
   Testing strips that are used are: ws2812 RGB strips.
   The final strips that are used are: ws2811 GRB strips. (current prototype strip is 40 leds big);
 */
+
 #define ID 3
+
+
+//Controller-Strip types
+#if ID == 3
+#define NUM_LEDS 200
+#define BRIGHTNESS  125 //200
+#define FRAMES_PER_SECOND  1000
+#define FADER 40
+#define PULSEFADER 40
+#define FALL_FADER 12
+#define UPDATEDELAY 20
+#else
+
+#define NUM_LEDS 600
+#define BRIGHTNESS  125 //200
+#define FRAMES_PER_SECOND  1000
+#define FADER 60
+#define PULSEFADER 60
+#define FALL_FADER 20
+#define UPDATEDELAY 0
+#endif
+bool stripTypeNew; //This is used in pulse.h to determine the settings.
+int newStripIds[] {3}; //Adjust this together with precompiler if!
+
 
 #include <LinkedList.h>
 #include "FastLED.h"
@@ -17,31 +42,26 @@
 #include "I2C.h"
 #include "Pulse.h"
 
-
 //Program assumes all used led strips to contain the same properties as listed below.
 FASTLED_USING_NAMESPACE
-#define NUM_LEDS  600
 
 //6m is 360, 7m is 420, 10M is 600
-#define BRIGHTNESS  125 //200
-#define FRAMES_PER_SECOND  1000
-#define FADER 60
-#define PULSEFADER 60
-#define FALL_FADER 20
 
 //Pinout
 //Brown and blue
 #define NUM_STRIPS 2 //When adjusting this, remember to also comment/uncomment FastLED.addleds in setup, and the ledstrip* array!!
 #define DATA0_PIN 2
 #define DATA1_PIN 14
-#define DATA2_PIN 8
-#define DATA3_PIN 7
 #define LED 13
 
 //Communication
 #define BAUD_RATE 57600
 #define COMMUNICATION_METHODE 2//1 for serial, 2 for I2C
 
+//Rest pulse vars
+const int restPulseHue = HUE_RED;
+long lastRestPulseTime;
+const long RestPulseTime = 500;
 
 struct ledstrip {
   CRGB leds[NUM_LEDS];
@@ -58,10 +78,8 @@ currentStates currentState;
 
 const int stripPins[] {DATA0_PIN, DATA1_PIN};
 
-//Rest pulse vars
-const int restPulseHue = HUE_RED;
-long lastRestPulseTime;
-const long RestPulseTime = 2000;
+long lastUpdate = 0;
+
 
 //Pulse vars
 const int pulseHue = HUE_RED;
@@ -114,8 +132,8 @@ void executeState() {
 
     case DeSync:
       Serial.println("Desync");
-      long loopTime = 8000;
-      long startTime = millis();
+      unsigned long loopTime = 8000;
+      unsigned long startTime = millis();
       while ((loopTime + startTime)  > millis()) {
         for (int i = 0; i < NUM_STRIPS; i++) {
           fadeToBlackBy(strips[i]->leds, NUM_LEDS, FALL_FADER);
@@ -134,7 +152,7 @@ void readInput() {
     case error:
       //Do nothing
       break;
-    case pulse:
+    case pulse1:
       if (currentState == Rest) {
         currentState = Pulsing;
       }
@@ -154,16 +172,43 @@ void readInput() {
     case backward:
       currentState = DeSync;
       break;
+    case rest:
+      //do nothing
+      break;
   }
 }
 
-void setup() {
-  delay(3000); // 3 second delay for recovery
+void checkForStripType() {
+  stripTypeNew = false;
+  // for (int i = 0; i < sizeof(newStripIds); i++) {
   if (ID == 3) {
+    stripTypeNew = true;
+    //  }
+  }
+}
+
+void printStartupDebug() {
+  Serial.print("ID:\t");
+  Serial.println(ID);
+  Serial.print("Strip type:\t");
+  if (stripTypeNew) {
+    Serial.println("WS2811(New)");
+  }
+  else {
+    Serial.println("WS2812(Old)");
+  }
+}
+void setup() {
+  //delay(3000); // 3 second delay for recovery
+
+  checkForStripType();
+  if (stripTypeNew) {
+
     FastLED.addLeds<WS2811, DATA0_PIN, GRB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   }
   else {
+
     FastLED.addLeds<WS2812, DATA0_PIN, RGB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     FastLED.addLeds<WS2812, DATA1_PIN, RGB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   }
@@ -192,14 +237,21 @@ void setup() {
   currentState = Pulsing;
   lastRestPulseTime = 0;
   //fillStripWithColorTemp();
+  delay(500);
+  printStartupDebug();
   FastLED.show();
-  //delay(30000);
+  delay(2500);
 }
 
 
 void loop() {
   //cHue();
   readInput();
-  executeState();
+
+  long currentTime = millis();
+  if (currentTime >= (lastUpdate + UPDATEDELAY)) {
+    executeState();
+    lastUpdate = millis();
+  }
 };
 

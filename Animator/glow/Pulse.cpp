@@ -3,22 +3,45 @@
 //Used for normal pulse
 Pulse::Pulse(CRGB * StripLeds, int Num_leds, int Hue) {
   this->leds = StripLeds;
-  this->NUM_LEDS = Num_leds;
+  this->num_leds = Num_leds;
   this->hue = Hue;
   pulseIndex = 0 - (firstWave + secondWave); // in case of tickSawWave
+  pulseDec = pulseIndex;
+
+  //Temp so we can prototype with the old strips.
+  //If id equals a new strip then use new strip settings
+  if (stripTypeNew) {
+    pulseSpeed = NEW_PULSESPEED;
+    fallSpeed = NEW_FALLSPEED;
+    firstWaveAmplitudeFactor = NEW_FIRSTWAVEAMPLITUDEFACTOR;
+    secondWaveAmplitudeFactor = NEW_SECONDWAVEAMPLITUDEFACTOR;
+  }
+  else {
+    pulseSpeed = OLD_PULSESPEED;
+    fallSpeed = OLD_FALLSPEED;
+    firstWaveAmplitudeFactor = OLD_FIRSTWAVEAMPLITUDEFACTOR;
+    secondWaveAmplitudeFactor = OLD_SECONDWAVEAMPLITUDEFACTOR;
+  }
 }
 
 //used for rest pulse
 Pulse::Pulse(CRGB* StripLeds, int Num_leds, int Hue, int customIndex) {
   this->leds = StripLeds;
-  this->NUM_LEDS = Num_leds;
+  this->num_leds = Num_leds;
   this->hue = Hue;
   pulseIndex = customIndex;
+  pulseDec = pulseIndex;
+  if (stripTypeNew) {
+    restPulseSpeed = NEW_RESTPULSESPEED;
+  }
+  else {
+    restPulseSpeed = OLD_RESTPULSESPEED;
+  }
   startTime = millis();
 }
 
 bool Pulse::tick() {
-  if ((pulseIndex + hPulseSize ) >= NUM_LEDS) {
+  if ((pulseIndex + hPulseSize ) >= num_leds) {
   }
   else {
     for ( int i = 0; i < hPulseSize; i ++) {
@@ -35,7 +58,7 @@ void Pulse::SawToothWave(int x, int waveSize, int tailWave, int amplitudeFactor)
   int currentPixel;
   int firstWaveSize = waveSize - tailWave;
   for (currentPixel = 0; currentPixel < firstWaveSize; currentPixel++) {
-    if ((currentPixel + x) >= 0 && (currentPixel + x ) < NUM_LEDS) {
+    if ((currentPixel + x) >= 0 && (currentPixel + x ) < num_leds) {
       int waveParticle = (triwave8(currentPixel) * amplitudeFactor + 20);
 
       if (waveParticle > 0) {
@@ -45,7 +68,7 @@ void Pulse::SawToothWave(int x, int waveSize, int tailWave, int amplitudeFactor)
   }
   //Serial.println("Secondwave");
   for (int i = tailWave, e = firstWaveSize; i >= 0; i--, currentPixel++, e -= 2) {
-    if ((currentPixel + x) >= 0 && (currentPixel + x ) < NUM_LEDS) {
+    if ((currentPixel + x) >= 0 && (currentPixel + x ) < num_leds) {
       int waveParticle = (triwave8(e) * amplitudeFactor + 20);
       if (waveParticle > 0) {
         leds[x + currentPixel] = CHSV(hue, 255, waveParticle);
@@ -55,7 +78,7 @@ void Pulse::SawToothWave(int x, int waveSize, int tailWave, int amplitudeFactor)
 }
 
 bool Pulse::tickCustomWave() {
-  if (pulseIndex + (waveSize * 2) >= NUM_LEDS) {
+  if (pulseIndex + (waveSize * 2) >= num_leds) {
     //Do nothing
   }
   else {
@@ -76,21 +99,21 @@ bool Pulse::tickCustomWave() {
       Serial.println(bigWaveBrightness[i]);
       leds[pulseIndex + e] = CHSV(hue, 255, smallWaveBrightness[i]);
     }
-    pulseIndex += pulseSpeed;
-    pulseDec = pulseIndex; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
+    pulseDec += restPulseSpeed;
+    pulseIndex = (int)pulseDec; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
   }
   return true;
 }
 bool Pulse::tickSawWave() {
-  if (pulseIndex >= NUM_LEDS) {
+  if (pulseIndex >= num_leds) {
     return false;
   }
   else {
     SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
-    SawToothWave(pulseIndex, secondWave, waveTail, secondWaveAmplitudeFactor);
+    //SawToothWave(pulseIndex, secondWave, waveTail, secondWaveAmplitudeFactor);
 
-    pulseIndex += pulseSpeed;
-    pulseDec = pulseIndex; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
+    pulseDec += restPulseSpeed;
+    pulseIndex = (int)pulseDec; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
   }
   return true;
 }
@@ -98,8 +121,9 @@ bool Pulse::tickSawWave() {
 
 bool Pulse::tickRestWave() {
   Serial.print("Ticking rest wave: \t");
-  if (pulseIndex >= NUM_LEDS) {
-    Serial.println("index too high");
+  if (pulseIndex >= num_leds) {
+    Serial.print("index too high");
+    Serial.println(pulseIndex);
     return false;
   }
   else {
@@ -107,7 +131,7 @@ bool Pulse::tickRestWave() {
     int currentTime = millis();
     if (startTime + restpulseLifeTime > currentTime) {
       for (int i = 0; i < restpulseSize; i++) {
-        if (pulseIndex + i < NUM_LEDS) {
+        if (pulseIndex + i < num_leds ) {
           leds[pulseIndex + i] = CHSV(restHue, 255, brightness);
         }
       }
@@ -117,9 +141,8 @@ bool Pulse::tickRestWave() {
       //But for now end
       return false;
     }
-
-    pulseIndex += restPulseSpeed;
-    pulseDec = pulseIndex; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
+    pulseDec += restPulseSpeed;
+    pulseIndex = (int)pulseDec; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
   }
   return true;
 }
@@ -132,6 +155,7 @@ bool Pulse::fall() {
     SawToothWave(pulseIndex + secondWave, firstWave, waveTail, firstWaveAmplitudeFactor);
     SawToothWave(pulseIndex, secondWave, waveTail, secondWaveAmplitudeFactor);
   }
-  pulseIndex -= fallSpeed;
+  pulseDec -= fallSpeed;
+  pulseIndex = (int)pulseDec; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
   return true;
 }
