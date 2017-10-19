@@ -1,5 +1,16 @@
+/*
+   Main class for the logic of the program
+*/
+
 #include "Controller.h"
 
+/*
+   Controller constructor
+   Expects an Input object for acces to the value of the buttons/ultrasoons/etc..
+   Expects a number for selecting a communication methode with the slaves
+   Expects the amount of animators (slaves) that it controlles
+   And expect and id that is needed for communication over the I2C bus
+*/
 Controller::Controller(Input* input, int comMethod, int numAnimators, int id)
 {
   this->_input = input;
@@ -9,6 +20,10 @@ Controller::Controller(Input* input, int comMethod, int numAnimators, int id)
   this->id = id;
 }
 
+/*
+   This function always needs to be called when using this class
+   it functions like the setup function in an ino file
+*/
 void Controller::Begin()
 {
   switch (communicationMethod) {
@@ -18,15 +33,20 @@ void Controller::Begin()
     case 2://I2C
       COM = new I2C(this->id);
       break;
-    default:
+    default://Default is I2C
+      COM = new I2C(this->id);
       break;
   };
-  COM->Begin();
-  this->Reset();
+  COM->Begin();//Begin communication
+  this->Reset();//Reset/init all the vars
 }
 
+/*
+   Function that holds the logic/flow of the program
+*/
 void Controller::Logic(void)
 {
+  //First check if syning has failed (somebody let go)
   if (syncingFailed)
   {
     this->LetGo();
@@ -34,17 +54,27 @@ void Controller::Logic(void)
     syncingFailed = false;
     this->Reset();
   }
+  //Else check if syncing has started
   else if (syncing)
   {
     //Check if somebody let go
     if (this->checkLetGo())
     {
-      this->syncing = false;
-      this->syncingFailed = true;
+      /*
+         The person can reconnect with the tree within a given time
+      */
+      delay(150);//Built this better with a timer and not sending a pulse to the hand that is connected.
+      if (this->checkLetGo())
+      {
+        this->syncing = false;
+        this->syncingFailed = true;
+      }
     }
     else
     {
+      //Execute sync
       this->syncTime = millis();
+      //Check if sync is complete
       if (this->syncTime - this->oldSyncTime >= this->syncPreset)
       {
         //Sync completed
@@ -54,26 +84,24 @@ void Controller::Logic(void)
       }
       else
       {
-        //Put here the code for syncing
+        //Just do a pulse
         this->Pulse();
       }
     }
   }
+  //If not syncing look if all inputs are high to start syncing
   else if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
            /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, do sync
   {
     this->syncing = true;
-    //Set pulse time the same
-    for (int i = 0; i < 6; i++)
-    {
-      this->pulseTime[i] = 2500;
-    }
-    this->oldSyncTime = millis();
     this->Pulse();//Pulse to update old time values
-    //Calculate the difference here
-    this->calculateAdjustments();
-
+    this->calculateAdjustments();//Calculate the difference here
+    /*
+       Built a delay so syncing starts later, first some more pulses
+    */
+    this->oldSyncTime = millis();
   }
+  //Else check if one of the inputs is high
   else if (_input->getInputHigh(0) == true || _input->getInputHigh(1) == true || _input->getInputHigh(2) == true
            || _input->getInputHigh(3) == true || _input->getInputHigh(4) == true || _input->getInputHigh(5) == true)
   {
@@ -81,7 +109,10 @@ void Controller::Logic(void)
   }
   else
   {
-    //Idle, do nothing
+    /*
+       Idle, rest state
+       To inplement
+    */
   }
 }
 
@@ -116,11 +147,13 @@ void Controller::Pulse(void)//Two inputs at the moment
 {
   this->currentTime = millis();
   long timeDifference = oldTime[0] - oldTime[1];
-  if (timeDifference < 20 && timeDifference > -20)
+  if (timeDifference < 20 && timeDifference > -20)//Stop adjusting whenever the difference between pulses is less than 20
   {
-    pulseTime[0] = 2500;
-    pulseTime[1] = 2500;
-    oldTime[0] += timeDifference;
+    for (int i = 0; i < 6; i ++)
+    {
+      pulseTime[i] = 2500;
+    }
+    //Add a final correction to get them perfectly synced.
   }
   for (int i = 0; i < this->numberAnimators; i++)
   {

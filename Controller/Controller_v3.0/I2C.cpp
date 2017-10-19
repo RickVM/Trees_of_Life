@@ -1,8 +1,10 @@
 #include "I2C.h"
 
+//Vars needed by the onreceive event
 String receivedMessage;
 boolean received;
 
+//Function prototype
 void receiveEvent(int howMany);
 
 I2C::I2C(int id)
@@ -10,7 +12,6 @@ I2C::I2C(int id)
   this->id = id;
   receivedMessage = "";
   received = false;
-  Serial.begin(9600);
 }
 
 I2C::~I2C(void)
@@ -18,6 +19,9 @@ I2C::~I2C(void)
 
 }
 
+/*
+ * Setup of I2C
+ */
 void I2C::Begin()
 {
   Wire.begin();
@@ -26,6 +30,11 @@ void I2C::Begin()
   Wire.onReceive(receiveEvent);
 }
 
+/*
+ * Function that reads if there has been an new message received
+ * if a new one has been received it gets checked against the protocol 
+ * and returnd to the caller of the function
+ */
 COMMANDS I2C::readCommand(int id)
 {
   COMMANDS rv = error;
@@ -38,6 +47,11 @@ COMMANDS I2C::readCommand(int id)
   return rv;
 }
 
+/*
+ * Function to send a message over the I2C bus
+ * needs a buffer because the wire library does not no the type String
+ * expects an string of type char array.
+ */
 int I2C::sendCommand(int id, String message)
 {
   int rv = 0;
@@ -54,13 +68,15 @@ int I2C::sendCommand(int id, String message)
   return rv;
 }
 
+/*
+ * Function that get's trigger when ever a new message is received
+ */
 void receiveEvent(int howMany)
 {
   bool _command = false;
   String msg = "";
   int _readByte = 0;
   char _receivedChar = 0;
-  Serial.println("Receive event triggerd");
   while (Wire.available() > 0)
   {
     _readByte = Wire.read();
