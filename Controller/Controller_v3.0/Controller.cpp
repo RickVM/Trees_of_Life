@@ -264,14 +264,14 @@ bool Controller::checkSync()
 void Controller::syncStop(void)
 {
   this->currentTime = millis();
-  for (int i = 1; i < this->numberAnimators; i++)
+ /* for (int i = 1; i < this->numberAnimators; i++)
   {
     finalAdjustment[i] = oldTime[0] - oldTime[i];
     Serial.print("Time difference: ");
     Serial.print(finalAdjustment[i]);
     Serial.print(" of : ");
     Serial.println(i);
-  }
+  }/*
 
   /* if (this->checkSyncStop())
     {
@@ -286,7 +286,7 @@ void Controller::syncStop(void)
      }
     }
   */
-  /*
+  
   long timeDifference = oldTime[0] - oldTime[1];
   if (timeDifference < 20 && timeDifference > -20 && timeDifference != 0)//Stop adjusting whenever the difference between pulses is less than 20
   {
@@ -295,7 +295,7 @@ void Controller::syncStop(void)
       pulseTime[i] = PULSE_TIME;
     }
     //Add a final correction to get them perfectly synced.
-  }*/
+  }
 }
 
 void Controller::Pulse(void)//Two inputs at the moment
@@ -320,14 +320,14 @@ void Controller::Pulse(void)//Two inputs at the moment
         };
         COM->sendCommand((i + 1), M);
         this->oldTime[i] = this->currentTime;
-        if (finalAdjustment[i] < 20 && finalAdjustment[i] > -20 && finalAdjustment[i] != 0)//Stop adjusting whenever the difference between pulses is less than 20
+        /*if (finalAdjustment[i] < 20 && finalAdjustment[i] > -20 && finalAdjustment[i] != 0)//Stop adjusting whenever the difference between pulses is less than 20
         {
           for (int i = 0; i < 6; i ++)
           {
             pulseTime[i] = PULSE_TIME;
           }
           //Add a final correction to get them perfectly synced.
-        }
+        }*/
       }
     }
   }
