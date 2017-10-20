@@ -27,14 +27,14 @@ void setup() {
 
   pinMode(trigPin1, OUTPUT);
   pinMode(echoPin1, INPUT);
-  pinMode(led, OUTPUT);
+    pinMode(led, OUTPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   printUs0();
   //printUs1();
-  delay(DELAY);
+    delay(DELAY);
 }
 
 
