@@ -43,6 +43,7 @@ class Controller {
     long adjustmentSteps[6];
     int countSync[6];
     void Reset(void);
-
+    boolean syncWait;
+    String M;
 };
 

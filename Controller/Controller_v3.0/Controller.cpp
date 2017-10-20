@@ -4,6 +4,8 @@
 
 #include "Controller.h"
 
+#define SYNC_DELAY 5000
+
 /*
    Controller constructor
    Expects an Input object for acces to the value of the buttons/ultrasoons/etc..
@@ -54,21 +56,38 @@ void Controller::Logic(void)
     syncingFailed = false;
     this->Reset();
   }
+  else if (this->syncWait) //Check for syncing
+  {
+    //Check if somebody let go
+    if (this->checkLetGo())
+    {
+      this->syncing = false;
+      this->syncingFailed = true;
+    }
+    else {
+      this->syncTime = millis();
+      this->Pulse();
+      if (this->syncTime - this-> oldSyncTime > SYNC_DELAY)
+      {
+
+        this->syncing = true;
+        this->Pulse();//Pulse to update old time values
+        this->calculateAdjustments();//Calculate the difference here
+        this->syncTime = millis();
+        this->oldSyncTime = millis();
+        this->syncWait = false;
+        Serial.println("Exit sync wait loop");
+      }
+    }
+  }
   //Else check if syncing has started
   else if (syncing)
   {
     //Check if somebody let go
     if (this->checkLetGo())
     {
-      /*
-         The person can reconnect with the tree within a given time
-      */
-      delay(150);//Built this better with a timer and not sending a pulse to the hand that is connected.
-      if (this->checkLetGo())
-      {
-        this->syncing = false;
-        this->syncingFailed = true;
-      }
+      this->syncing = false;
+      this->syncingFailed = true;
     }
     else
     {
@@ -93,13 +112,11 @@ void Controller::Logic(void)
   else if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
            /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, do sync
   {
-    this->syncing = true;
-    this->Pulse();//Pulse to update old time values
-    this->calculateAdjustments();//Calculate the difference here
-    /*
-       Built a delay so syncing starts later, first some more pulses
-    */
+    //Start with the sync delay loop
     this->oldSyncTime = millis();
+    this->syncTime = millis();
+    Serial.println("Entering sync wait loop");
+    this->syncWait = true;
   }
   //Else check if one of the inputs is high
   else if (_input->getInputHigh(0) == true || _input->getInputHigh(1) == true || _input->getInputHigh(2) == true
@@ -138,7 +155,12 @@ bool Controller::checkLetGo()
   if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
       /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, nobody let go
   {
-    rv = false;
+    delay(25);
+    if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
+        /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, nobody let go
+    {
+      rv = false;
+    }
   }
   return rv;
 }
@@ -161,7 +183,18 @@ void Controller::Pulse(void)//Two inputs at the moment
     {
       if (this->currentTime - this->oldTime[i] > this->pulseTime[i])
       {
-        COM->sendCommand((i + 1), "pulse");
+        switch (_input->getInputClassification(i)) {
+          case 1:
+            this->M = "pulse1";
+            break;
+          case 2:
+            this->M = "pulse2";
+            break;
+          case 3:
+            this->M = "pulse3";
+            break;
+        };
+        COM->sendCommand((i + 1), M);
         this->oldTime[i] = this->currentTime;
       }
     }
@@ -195,5 +228,7 @@ void Controller::Reset(void)
   this->syncingFailed = false;
   this->syncTime = 0;
   this->oldSyncTime = 0;
+  this->syncWait = false;
+  this->M = "";
 }
 

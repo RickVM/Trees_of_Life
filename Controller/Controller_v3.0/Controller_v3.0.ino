@@ -20,8 +20,8 @@ Input* input;
 Controller* c;
 
 //Input arrays
-uint8_t inputsArray[NUM_INPUTS] = {14, 15, 16};//Change the numbers, but DO NOT DELETE THIS ARRAY
-uint8_t triggerArray[NUM_INPUTS] = {17, 16};
+uint8_t inputsArray[6] = {14, 15, 16, 17, 20, 21};//Change the numbers, but DO NOT DELETE THIS ARRAY
+uint8_t triggerArray[6] = {12, 11, 6, 4, 3, 2};
 
 void setup()
 {

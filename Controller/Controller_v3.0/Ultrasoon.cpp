@@ -2,7 +2,7 @@
 
 Ultrasoon::Ultrasoon(uint8_t numInputs, uint8_t* trigPins, uint8_t* echoPins) : Input()
 {
-  this->numInputs = 1;
+  this->numInputs = numInputs;
   this->trigPins = trigPins;
   this->echoPins = echoPins;
 }
@@ -19,7 +19,7 @@ void Ultrasoon::Begin(void)
     pinMode(this->trigPins[i], OUTPUT);
     pinMode(this->echoPins[i], INPUT);
   }
-  this->setRequiredDistance(5);
+  this->setRequiredDistance(11);
 }
 
 void Ultrasoon::PingDistance(void)
@@ -40,6 +40,12 @@ void Ultrasoon::PingDistance(void)
     duration[i] = pulseIn(echoPins[i], HIGH);
     setInput(i, ((duration[i] / 2) / 29.1));
   }
+  Serial.print("The ultrasoon values are: ");
+  Serial.print(duration[0]);
+  Serial.print(", ");
+  Serial.println(duration[1]);
+  
+  
 }
 
 void Ultrasoon::readInputs(void)
