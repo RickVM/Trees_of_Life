@@ -23,9 +23,10 @@ int Input::formatByte(uint8_t* values)//Tested
    ALWAYS set this distance to minimum of 2
    otherwise input will not work.
 */
-void Input::setRequiredDistance(int x)
+void Input::setRequiredDistance(int x, int y)
 {
   requiredDistance = x;
+  minimalDistance = y;
 }
 
 /*
@@ -35,7 +36,7 @@ void Input::setRequiredDistance(int x)
 void Input::setInput(int pos, int x)
 {
   valueArray[pos] = x;
-  if (x > 0 && x < requiredDistance) {
+  if (x > minimalDistance && x < requiredDistance) {
     highOrLowArray[pos] = true;
     if (x < 6)
     {
@@ -50,7 +51,8 @@ void Input::setInput(int pos, int x)
       classificationArray[pos] = 3;//Add classification code here.
     }
   }
-  else if (x == 0) {
+  else
+  {
     highOrLowArray[pos] = false;
   }
 }
@@ -68,5 +70,10 @@ int Input::getInputValue(int pos)
 int Input::getInputClassification(int pos)
 {
   return classificationArray[pos];
+}
+
+int Input::getMethode(void)
+{
+  return this->inputMethode;
 }
 

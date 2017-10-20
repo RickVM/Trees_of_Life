@@ -1,10 +1,14 @@
 /*
    Main class for the logic of the program
+   Cycle time for a loop with ultrasoon is ~500 millis
+   Cycle time with buttons is ~75 millis
 */
 
 #include "Controller.h"
 
 #define SYNC_DELAY 5000
+#define PULSE_TIME 2500
+#define CYCLES 5
 
 /*
    Controller constructor
@@ -51,66 +55,19 @@ void Controller::Logic(void)
   //First check if syning has failed (somebody let go)
   if (syncingFailed)
   {
-    this->LetGo();
-    delay(4000);
-    syncingFailed = false;
-    this->Reset();
+    this->syncingFailedLogic();
   }
   else if (this->syncWait) //Check for syncing
   {
-    //Check if somebody let go
-    if (this->checkLetGo())
-    {
-      this->syncing = false;
-      this->syncingFailed = true;
-    }
-    else {
-      this->syncTime = millis();
-      this->Pulse();
-      if (this->syncTime - this-> oldSyncTime > SYNC_DELAY)
-      {
-
-        this->syncing = true;
-        this->Pulse();//Pulse to update old time values
-        this->calculateAdjustments();//Calculate the difference here
-        this->syncTime = millis();
-        this->oldSyncTime = millis();
-        this->syncWait = false;
-        Serial.println("Exit sync wait loop");
-      }
-    }
+    this->waitSyncLogic();
   }
   //Else check if syncing has started
   else if (syncing)
   {
-    //Check if somebody let go
-    if (this->checkLetGo())
-    {
-      this->syncing = false;
-      this->syncingFailed = true;
-    }
-    else
-    {
-      //Execute sync
-      this->syncTime = millis();
-      //Check if sync is complete
-      if (this->syncTime - this->oldSyncTime >= this->syncPreset)
-      {
-        //Sync completed
-        this->Flash();
-        this->Reset();
-        delay(12000);//12 seconds
-      }
-      else
-      {
-        //Just do a pulse
-        this->Pulse();
-      }
-    }
+    this->syncLogic();
   }
   //If not syncing look if all inputs are high to start syncing
-  else if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
-           /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, do sync
+  else if (this->checkSync())//All active, do sync
   {
     //Start with the sync delay loop
     this->oldSyncTime = millis();
@@ -133,6 +90,110 @@ void Controller::Logic(void)
   }
 }
 
+/*
+   Function that inplements the logic for when syncing fails.
+*/
+void Controller::syncingFailedLogic(void)
+{
+  this->LetGo();
+  delay(10000);
+  syncingFailed = false;
+  this->Reset();
+}
+
+/*
+
+*/
+void Controller::waitSyncLogic(void)
+{
+  //Check if somebody let go
+  if (this->checkLetGo())
+  {
+    //Count until 5 cycles then, a cycle is 500 millis
+    if (this->countLetGo == CYCLES)
+    {
+      this->syncing = false;
+      this->syncingFailed = true;
+      this->countLetGo = 0;
+    }
+    else
+    {
+      Serial.print("Cycle : ");
+      Serial.println(countLetGo);
+      this->countLetGo++;
+      this->syncPreset += 500;
+    }
+  }
+  else
+  {
+    this->syncTime = millis();
+    this->Pulse();
+    if (this->syncTime - this-> oldSyncTime > SYNC_DELAY)
+    {
+
+      this->syncing = true;
+      this->Pulse();//Pulse to update old time values
+      this->calculateAdjustments();//Calculate the difference here
+      this->syncTime = millis();
+      this->oldSyncTime = millis();
+      this->syncWait = false;
+      Serial.println("Exit sync wait loop");
+    }
+  }
+}
+
+void Controller::syncLogic(void)
+{
+  //Check if somebody let go
+  if (this->checkLetGo())
+  {
+    //Count until 5 cycles then
+    if (this->countLetGo == CYCLES)
+    {
+      this->syncing = false;
+      this->syncingFailed = true;
+      this->countLetGo = 0;
+    }
+    else
+    {
+      Serial.print("Cycle : ");
+      Serial.println(countLetGo);
+      Serial.print("Millis : ");
+      Serial.println(millis());
+      this->countLetGo++;
+      switch (_input->getMethode()) {
+        case 1://Buttons adjustime is the 75millis
+          this->syncPreset += 75;
+          break;
+        case 2://Ultrasonic, adjusttime is than 500 millis
+          this->syncPreset += 500;
+          break;
+        default:
+          //Not inplemented
+          break;
+      };
+    }
+  }
+  else
+  {
+    //Execute sync
+    this->countLetGo = 0;
+    this->syncTime = millis();
+    //Check if sync is complete
+    if (this->syncTime - this->oldSyncTime >= this->syncPreset)
+    {
+      //Sync completed
+      this->Flash();
+      this->Reset();
+      delay(12000);//12 seconds
+    }
+    else
+    {
+      this->Pulse();
+    }
+  }
+}
+
 void Controller::calculateAdjustments(void)
 {
   long average = 0;
@@ -151,32 +212,95 @@ void Controller::calculateAdjustments(void)
 
 bool Controller::checkLetGo()
 {
-  bool rv = true;
-  if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
-      /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, nobody let go
+  bool rv = false;
+  int temp = 0;
+  for (int i = 0; i < this->numberAnimators; i++)
   {
-    delay(25);
-    if (_input->getInputHigh(0) == true && _input->getInputHigh(1) == true && _input->getInputHigh(2) == true
-        /*&& _input->getInputHigh(3) == true && _input->getInputHigh(4) == true && _input->getInputHigh(5) == true*/)//All active, nobody let go
+    temp += _input->getInputHigh(i);
+  }
+  if (temp < numberAnimators)
+  {
+    delay(150);
+    _input->readInputs();//Read the inputs again
+    temp = 0;
+    for (int i = 0; i < this->numberAnimators; i++)
     {
-      rv = false;
+      temp += _input->getInputHigh(i);
+    }
+    if (temp < this->numberAnimators)
+    {
+      rv = true;
     }
   }
   return rv;
 }
 
-void Controller::Pulse(void)//Two inputs at the moment
+bool Controller::checkSync()
+{
+  bool rv = false;
+  int temp = 0;
+  for (int i = 0; i < this->numberAnimators; i++)
+  {
+    temp += _input->getInputHigh(i);
+  }
+  if (temp == this->numberAnimators)
+  {
+    delay(25);
+    _input->readInputs();
+    temp = 0;
+    for (int i = 0; i < this->numberAnimators; i++)
+    {
+      temp += _input->getInputHigh(i);
+    }
+    if (temp == this->numberAnimators)
+    {
+      rv = true;
+    }
+  }
+  return rv;
+}
+
+
+void Controller::syncStop(void)
 {
   this->currentTime = millis();
+  for (int i = 1; i < this->numberAnimators; i++)
+  {
+    finalAdjustment[i] = oldTime[0] - oldTime[i];
+    Serial.print("Time difference: ");
+    Serial.print(finalAdjustment[i]);
+    Serial.print(" of : ");
+    Serial.println(i);
+  }
+
+  /* if (this->checkSyncStop())
+    {
+     for (int i = 0; i < 6; i++)
+     {
+       pulseTime[i] = PULSE_TIME;
+     }
+     for (int k = 1; k < 6; k++)
+     {
+       pulseTime[k] += finalAdjustment[k];
+       finalSync[k] = true;
+     }
+    }
+  */
+  /*
   long timeDifference = oldTime[0] - oldTime[1];
-  if (timeDifference < 20 && timeDifference > -20)//Stop adjusting whenever the difference between pulses is less than 20
+  if (timeDifference < 20 && timeDifference > -20 && timeDifference != 0)//Stop adjusting whenever the difference between pulses is less than 20
   {
     for (int i = 0; i < 6; i ++)
     {
-      pulseTime[i] = 2500;
+      pulseTime[i] = PULSE_TIME;
     }
     //Add a final correction to get them perfectly synced.
-  }
+  }*/
+}
+
+void Controller::Pulse(void)//Two inputs at the moment
+{
+  this->syncStop();
   for (int i = 0; i < this->numberAnimators; i++)
   {
     if (_input->getInputHigh(i))
@@ -196,6 +320,14 @@ void Controller::Pulse(void)//Two inputs at the moment
         };
         COM->sendCommand((i + 1), M);
         this->oldTime[i] = this->currentTime;
+        if (finalAdjustment[i] < 20 && finalAdjustment[i] > -20 && finalAdjustment[i] != 0)//Stop adjusting whenever the difference between pulses is less than 20
+        {
+          for (int i = 0; i < 6; i ++)
+          {
+            pulseTime[i] = PULSE_TIME;
+          }
+          //Add a final correction to get them perfectly synced.
+        }
       }
     }
   }
@@ -221,8 +353,9 @@ void Controller::Reset(void)
 {
   for (int i = 0; i < 6; i++)
   {
-    this->pulseTime[i] = 2500;
-    countSync[i] = 0;
+    this->pulseTime[i] = PULSE_TIME;
+    this->oldTime[i] = 0;
+    this->finalAdjustment[i] = 0;
   }
   this->syncing = false;
   this->syncingFailed = false;
@@ -230,5 +363,7 @@ void Controller::Reset(void)
   this->oldSyncTime = 0;
   this->syncWait = false;
   this->M = "";
+  this->countLetGo = 0;
 }
+
 

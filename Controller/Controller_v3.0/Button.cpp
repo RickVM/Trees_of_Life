@@ -6,6 +6,7 @@ Button::Button(uint8_t numinputs, uint8_t* arrayinputs) : Input()
 {
   this->numInputs = numinputs;
   this->arrayinputs = arrayinputs;
+  this->inputMethode = 1;
 }
 
 Button::~Button()
@@ -23,7 +24,7 @@ void Button::Begin()
     buttons[i].attach(this->arrayinputs[i]);
     buttons[i].interval(15);
   }
-  this->setRequiredDistance(2);
+  this->setRequiredDistance(2, 0);
 }
 
 void Button::readInputs()

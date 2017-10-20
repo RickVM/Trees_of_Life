@@ -15,14 +15,19 @@ class Controller {
     //Objects
     Communication* COM;
     Input* _input;
-    
+
     int communicationMethod;
     int numberAnimators;
     int id;
-    
+
     long pulseTime[6] = {2500, 2500, 2500, 2500, 2500, 2500};
     long currentTime;
     long oldTime[6] = {0, 0, 0, 0, 0, 0};
+
+    void syncingFailedLogic(void);
+    void waitSyncLogic(void);
+    void syncLogic(void);
+    void syncStop(void);
 
     void Pulse(void);
     void Sync(void);
@@ -30,6 +35,7 @@ class Controller {
     void Flash(void);
 
     bool checkLetGo(void);
+    bool checkSync(void);
 
     boolean syncing;
     boolean syncingFailed;
@@ -37,13 +43,14 @@ class Controller {
     long syncTime;
     long oldSyncTime;
     long syncPreset;
-   
+
     void calculateAdjustments(void);
     long adjustmentTimes[6];
     long adjustmentSteps[6];
-    int countSync[6];
+    long finalAdjustment[6];
     void Reset(void);
     boolean syncWait;
     String M;
+    int countLetGo;
 };
 
