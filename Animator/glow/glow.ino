@@ -20,8 +20,8 @@
 #define FRAMES_PER_SECOND  1000
 #define FADER 40
 #define PULSEFADER 40
-#define FALL_FADER 12
-#define UPDATEDELAY 20
+#define FALL_FADER 30
+#define FPS 40
 #else
 
 #define NUM_LEDS 600
@@ -30,8 +30,10 @@
 #define FADER 60
 #define PULSEFADER 60
 #define FALL_FADER 20
-#define UPDATEDELAY 0
+#define FPS 1000
 #endif
+
+
 bool stripTypeNew; //This is used in pulse.h to determine the settings.
 int newStripIds[] {3}; //Adjust this together with precompiler if!
 
@@ -59,9 +61,14 @@ FASTLED_USING_NAMESPACE
 #define COMMUNICATION_METHODE 2//1 for serial, 2 for I2C
 
 //Rest pulse vars
-const int restPulseHue = HUE_RED;
+//Pulse vars
+const int pulseHue = HUE_RED;
+const int restPulseHue = 90;
 long lastRestPulseTime;
 const long RestPulseTime = 500;
+double pulse1Intensity = 1;
+double pulse2Intensity = 0.5;
+double pulse3Intensity = 0.2;
 
 struct ledstrip {
   CRGB leds[NUM_LEDS];
@@ -81,20 +88,19 @@ const int stripPins[] {DATA0_PIN, DATA1_PIN};
 long lastUpdate = 0;
 
 
-//Pulse vars
-const int pulseHue = HUE_RED;
+
 
 //Beat Flash vars
 const int nrOfBeats = 4;
 const int nrOfFlashes = 1;
 const int beatFrames = 10; //Number of frames used in the brightness transition
-const int beatDelay = 10 / beatFrames; //Delay between each frame
-const int beatBrightness = 180; // Total brightness the flash reaches.
+const int beatDelay = 18; //Delay between each frame
+const int beatBrightness = 100; // Total brightness the flash reaches.
 const int flashSpeed = 10;
-const int rFlash = 0;
-const int gFlash = 0;
-const int bFlash = 70;
-const int smallValveDelay = 5;
+const int flashR = 255;
+const int flashG = 0;
+const int flashB = 0;
+const int smallValveDelay = 10;
 const int bigValveDelay = 450;
 
 //Communication
@@ -104,17 +110,17 @@ LinkedList<Pulse *> Pulses;
 LinkedList<Pulse *> RestPulses;
 
 void executeState() {
-  Serial.print("Executing state: \t");
+  //Serial.print("Executing state: \t");
   switch (currentState) {
     case Rest:
-      Serial.println("Rest");
+      //Serial.println("Rest");
       pulseFade();
       fakeRestPulse(); //For test purposes
       doRestPulse();
       FastLED.show();
       break;
     case Pulsing:
-      Serial.println("Pulsing");
+      //Serial.println("Pulsing");
       if (Pulses.size() == 0) {
         currentState = Rest;
         return;
@@ -124,14 +130,14 @@ void executeState() {
       FastLED.show();
       break;
     case Synchronized:
-      Serial.println("Synced");
+      //Serial.println("Synced");
       //flash state (flash)
       valveBeat();
       currentState = Pulsing;
       break;
 
     case DeSync:
-      Serial.println("Desync");
+      //Serial.println("Desync");
       unsigned long loopTime = 8000;
       unsigned long startTime = millis();
       while ((loopTime + startTime)  > millis()) {
@@ -146,6 +152,18 @@ void executeState() {
   }
 }
 
+void mPulse(double intensity) {
+  if (currentState == Rest) {
+    currentState = Pulsing;
+  }
+  if (currentState == Pulsing) { //Only if in pulse or rest state. When moving this to another file, dont forget to make currentState extern!
+    //MAKE 1 PULSE FOR EACH STRIP
+    for (int i = 0; i < NUM_STRIPS; i++) {
+      makePulse(i, intensity);
+    }
+  }
+}
+
 void readInput() {
   COMMANDS x = COM->readCommand(ID);
   switch (x) {
@@ -153,22 +171,18 @@ void readInput() {
       //Do nothing
       break;
     case pulse1:
-      if (currentState == Rest) {
-        currentState = Pulsing;
-      }
-      if (currentState == Pulsing) { //Only if in pulse or rest state. When moving this to another file, dont forget to make currentState extern!
-        //MAKE 1 PULSE FOR EACH STRIP
-        for (int i = 0; i < NUM_STRIPS; i++) {
-          makePulse(i);
-        }
-      }
+      mPulse(pulse1Intensity);
       break;
-
+    case pulse2:
+      mPulse(pulse2Intensity);
+        break;
+    case pulse3:
+      mPulse(pulse3Intensity);
+      break;
     case flash:
       deletePulses();
       currentState = Synchronized;
       break;
-
     case backward:
       currentState = DeSync;
       break;
@@ -245,11 +259,9 @@ void setup() {
 
 
 void loop() {
-  //cHue();
   readInput();
-
   long currentTime = millis();
-  if (currentTime >= (lastUpdate + UPDATEDELAY)) {
+  if (currentTime >= (lastUpdate + (1000 / FPS))) {
     executeState();
     lastUpdate = millis();
   }

@@ -39,7 +39,7 @@ void deleteRestPulse(int i) {
 //Does a tick for all pulses and deletes finished ones.
 void doPulse() {
   for (int i = 0; i < Pulses.size(); i++) {
-    Serial.println("Doing a pulse in dopulse");
+    //Serial.println("Doing a pulse in dopulse");
     if (Pulses.get(i)->tickSawWave()) { //tickSawWave
     }
     else {
@@ -63,11 +63,11 @@ void collapsePulse() {
 }
 
 //Makes a new pulse for the strip
-void makePulse(int strip) {
-  Serial.print("Making a normal pulse\t-\t");
-  Pulse * P = new Pulse(strips[strip]->leds, NUM_LEDS, pulseHue);
+void makePulse(int strip, double intensity) {
+  Serial.printf("Making a pulse with intensity: %f\n  ", intensity);
+  Pulse * P = new Pulse(strips[strip]->leds, NUM_LEDS, pulseHue, intensity);
   Pulses.add(P);
-  Serial.println("Pulse made");
+  //Serial.println("Pulse made");
 }
 
 void deletePulses() {
@@ -80,7 +80,7 @@ void deletePulses() {
 
 //Deletes a pulse at the given index from the pulses list
 void deletePulse(int i) {
-  Serial.println("Deleting pulse");
+  //Serial.println("Deleting pulse");
   Pulse * P = Pulses.remove(i);
   delete(P);
   P = NULL;

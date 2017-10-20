@@ -26,27 +26,31 @@ void beat() {
   int b = 0;
   int x = beatBrightness / beatFrames;
 
-  for (int i = 0; i < beatFrames; i++) {
+  for (int i = 0; i < beatFrames; i++) { 
     FastLED.setBrightness(b += x);
     FastLED.show();
     FastLED.delay(beatDelay);
   }
-  for (int i = 0; i < (beatFrames - 1); i++) {
+  for (int i = 0; i < (beatFrames); i++) { //Do beatFrames -1 if you want to dim leds but not turn them off
     FastLED.setBrightness(b -= x);
     FastLED.show();
     FastLED.delay(beatDelay);
   }
+  
+  /*
   //Now do half so we dont turn the leds off but dim them
+  Also set beatframes -1 in the above loop!
   FastLED.setBrightness(b -= (x / 2));
   FastLED.show();
   FastLED.delay(beatDelay);
+  */
 }
 
 //Sub-function that sets the right color for beats.
 void setColourForTreeBeat() {
   for (int i = 0; i < NUM_STRIPS; i++) {
     for (int j = 0; j < NUM_LEDS; j++) {
-      strips[i]->leds[j] = CRGB(rFlash, gFlash, bFlash);
+     strips[i]->leds[j] = CRGB(flashR, flashG, flashB);
     }
   }
 }
@@ -58,22 +62,6 @@ void resetStrips() {
     }
   }
   FastLED.setBrightness(BRIGHTNESS);
-}
-
-void fillStripWithColor() {
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int e = 0; e < NUM_LEDS; e++) {
-      strips[i]->leds[e] = CHSV(pulseHue, 255, 18);
-    }
-  }
-}
-
-void fillStripWithColorTemp() {
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int e = 0; e < NUM_LEDS; e++) {
-      strips[i]->leds[e] = CHSV(pulseHue, 255, 255);
-    }
-  }
 }
 
 /*  Old animations
