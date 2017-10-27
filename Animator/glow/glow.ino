@@ -10,6 +10,12 @@
   The final strips that are used are: ws2811 GRB strips. (current prototype strip is 40 leds big);
 */
 
+#include <LinkedList.h>
+#include "FastLED.h"
+#include "UART.h"
+#include "I2C.h"
+#include "Pulse.h"
+
 #define ID 3
 
 
@@ -37,12 +43,6 @@
 bool stripTypeNew; //This is used in pulse.h to determine the settings.
 int newStripIds[] {3}; //Adjust this together with precompiler if!
 
-
-#include <LinkedList.h>
-#include "FastLED.h"
-#include "UART.h"
-#include "I2C.h"
-#include "Pulse.h"
 
 //Program assumes all used led strips to contain the same properties as listed below.
 FASTLED_USING_NAMESPACE

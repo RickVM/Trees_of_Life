@@ -20,7 +20,7 @@ void Ultrasoon::Begin(void)
     pinMode(this->trigPins[i], OUTPUT);
     pinMode(this->echoPins[i], INPUT);
   }
-  this->setRequiredDistance(11, 1);
+  this->setRequiredDistance(9, 1);
 }
 
 void Ultrasoon::PingDistance(void)

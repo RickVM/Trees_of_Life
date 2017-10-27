@@ -38,11 +38,11 @@ void Input::setInput(int pos, int x)
   valueArray[pos] = x;
   if (x > minimalDistance && x < requiredDistance) {
     highOrLowArray[pos] = true;
-    if (x < 6)
+    if (x < 5)
     {
       classificationArray[pos] = 1;//Add classification code here.
     }
-    else if (x < 8)
+    else if (x < 7)
     {
       classificationArray[pos] = 2;//Add classification code here.
     }

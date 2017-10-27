@@ -6,7 +6,7 @@
 
 #include "Controller.h"
 
-#define SYNC_DELAY 5000
+#define SYNC_DELAY 1000
 #define PULSE_TIME 2500
 #define CYCLES 5
 
@@ -22,7 +22,7 @@ Controller::Controller(Input* input, int comMethod, int numAnimators, int id)
   this->_input = input;
   this->communicationMethod = comMethod;
   this->numberAnimators = numAnimators;
-  this->syncPreset = 25000;
+  this->syncPreset = 15000;
   this->id = id;
 }
 
@@ -271,9 +271,9 @@ void Controller::syncStop(void)
     Serial.print(finalAdjustment[i]);
     Serial.print(" of : ");
     Serial.println(i);
-  }/*
+  }
 
-  /* if (this->checkSyncStop())
+   if (this->checkSyncStop())
     {
      for (int i = 0; i < 6; i++)
      {
