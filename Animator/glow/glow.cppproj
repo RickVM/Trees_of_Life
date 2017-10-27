@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>7.0</ProjectVersion>
+    <ToolchainName>com.Atmel.ARMGCC.CPP</ToolchainName>
+    <ProjectGuid>{de6fd7b1-2b5d-40cd-807a-edf885dceb9a}</ProjectGuid>
+    <avrdevice>ATSAM3X8E</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>CPP</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>glow</AssemblyName>
+    <Name>glow</Name>
+    <RootNamespace>glow</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress />
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue />
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>1</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data>
+  <options />
+  <configurations />
+  <files />
+  <documentation help="" />
+  <offline-documentation help="" />
+  <dependencies>
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.25.0" />
+  </dependencies>
+</framework-data>
+    </AsfFrameworkConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <ArmGccCpp>
+  <armgcc.common.outputfiles.hex>True</armgcc.common.outputfiles.hex>
+  <armgcc.common.outputfiles.lss>True</armgcc.common.outputfiles.lss>
+  <armgcc.common.outputfiles.eep>True</armgcc.common.outputfiles.eep>
+  <armgcc.common.outputfiles.bin>True</armgcc.common.outputfiles.bin>
+  <armgcc.common.outputfiles.srec>True</armgcc.common.outputfiles.srec>
+  <armgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>__HARDWARE_MK20dx256__</Value>
+      <Value>__HARDWARE_MK20DX256__</Value>
+      <Value>ARDUINO=10804</Value>
+      <Value>ARDUINO_MAIN</Value>
+      <Value>printf=iprintf</Value>
+      <Value>__TEENSY3__</Value>
+      <Value>__MK20DX256__</Value>
+      <Value>TEENSYDUINO=139</Value>
+      <Value>F_CPU={build.fcpu}</Value>
+      <Value>{build.usbtype}</Value>
+      <Value>LAYOUT_{build.keylayout}</Value>
+    </ListValues>
+  </armgcc.compiler.symbols.DefSymbols>
+  <armgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../../glow</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/FastLED</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/LinkedList</Value>
+      <Value>C:/Program Files (x86)/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/libraries</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/avr</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/util</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/utils</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/../tools/arm/bin/../arm-none-eabi/include</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy</Value>
+    </ListValues>
+  </armgcc.compiler.directories.IncludePaths>
+  <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
+  <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
+  <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
+  <armgcccpp.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>__HARDWARE_MK20dx256__</Value>
+      <Value>__HARDWARE_MK20DX256__</Value>
+      <Value>ARDUINO=10804</Value>
+      <Value>ARDUINO_MAIN</Value>
+      <Value>printf=iprintf</Value>
+      <Value>__TEENSY3__</Value>
+      <Value>__MK20DX256__</Value>
+      <Value>TEENSYDUINO=139</Value>
+      <Value>F_CPU={build.fcpu}</Value>
+      <Value>{build.usbtype}</Value>
+      <Value>LAYOUT_{build.keylayout}</Value>
+    </ListValues>
+  </armgcccpp.compiler.symbols.DefSymbols>
+  <armgcccpp.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../../glow</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/FastLED</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/LinkedList</Value>
+      <Value>C:/Program Files (x86)/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/libraries</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/avr</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/util</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/utils</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/../tools/arm/bin/../arm-none-eabi/include</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy</Value>
+    </ListValues>
+  </armgcccpp.compiler.directories.IncludePaths>
+  <armgcccpp.compiler.optimization.level>Optimize (-O1)</armgcccpp.compiler.optimization.level>
+  <armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcccpp.compiler.optimization.DebugLevel>Maximum (-g3)</armgcccpp.compiler.optimization.DebugLevel>
+  <armgcccpp.compiler.warnings.AllWarnings>True</armgcccpp.compiler.warnings.AllWarnings>
+  <armgcccpp.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </armgcccpp.linker.libraries.Libraries>
+  <armgcccpp.linker.libraries.LibrarySearchPaths>
+    <ListValues>
+      <Value>../cmsis/linkerScripts</Value>
+    </ListValues>
+  </armgcccpp.linker.libraries.LibrarySearchPaths>
+  <armgcccpp.linker.optimization.GarbageCollectUnusedSections>True</armgcccpp.linker.optimization.GarbageCollectUnusedSections>
+  <armgcccpp.linker.miscellaneous.LinkerFlags>-Tsamd21e18a_flash.ld</armgcccpp.linker.miscellaneous.LinkerFlags>
+  <armgcccpp.assembler.debugging.DebugLevel>Default (-g)</armgcccpp.assembler.debugging.DebugLevel>
+  <armgcccpp.preprocessingassembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel\Device\ATMEL\samd21\include</Value>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel</Value>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel\CMSIS\Include</Value>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel\Device\ATMEL</Value>
+    </ListValues>
+  </armgcccpp.preprocessingassembler.general.IncludePaths>
+  <armgcccpp.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcccpp.preprocessingassembler.debugging.DebugLevel>
+</ArmGccCpp>
+    </ToolchainSettings>
+    <VMSETTING_IncludePaths>../../../glow;C:/Users/Simon/Documents/Arduino/libraries/FastLED;C:/Users/Simon/Documents/Arduino/libraries/LinkedList;C:/Program Files (x86)/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/teensy/avr/libraries;C:/Users/Simon/Documents/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/avr;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/util;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/utils;C:/Program Files (x86)/Arduino/hardware/teensy/../tools/arm/bin/../arm-none-eabi/include;C:/Program Files (x86)/Arduino/hardware/teensy;</VMSETTING_IncludePaths>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <ArmGccCpp>
+  <armgcc.common.outputfiles.hex>True</armgcc.common.outputfiles.hex>
+  <armgcc.common.outputfiles.lss>True</armgcc.common.outputfiles.lss>
+  <armgcc.common.outputfiles.eep>True</armgcc.common.outputfiles.eep>
+  <armgcc.common.outputfiles.bin>True</armgcc.common.outputfiles.bin>
+  <armgcc.common.outputfiles.srec>True</armgcc.common.outputfiles.srec>
+  <armgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>__HARDWARE_MK20dx256__</Value>
+      <Value>__HARDWARE_MK20DX256__</Value>
+      <Value>ARDUINO=10804</Value>
+      <Value>ARDUINO_MAIN</Value>
+      <Value>printf=iprintf</Value>
+      <Value>__TEENSY3__</Value>
+      <Value>__MK20DX256__</Value>
+      <Value>TEENSYDUINO=139</Value>
+      <Value>F_CPU={build.fcpu}</Value>
+      <Value>{build.usbtype}</Value>
+      <Value>LAYOUT_{build.keylayout}</Value>
+    </ListValues>
+  </armgcc.compiler.symbols.DefSymbols>
+  <armgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../../glow</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/FastLED</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/LinkedList</Value>
+      <Value>C:/Program Files (x86)/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/libraries</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/avr</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/util</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/utils</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/../tools/arm/bin/../arm-none-eabi/include</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy</Value>
+    </ListValues>
+  </armgcc.compiler.directories.IncludePaths>
+  <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
+  <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
+  <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
+  <armgcccpp.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>__HARDWARE_MK20dx256__</Value>
+      <Value>__HARDWARE_MK20DX256__</Value>
+      <Value>ARDUINO=10804</Value>
+      <Value>ARDUINO_MAIN</Value>
+      <Value>printf=iprintf</Value>
+      <Value>__TEENSY3__</Value>
+      <Value>__MK20DX256__</Value>
+      <Value>TEENSYDUINO=139</Value>
+      <Value>F_CPU={build.fcpu}</Value>
+      <Value>{build.usbtype}</Value>
+      <Value>LAYOUT_{build.keylayout}</Value>
+    </ListValues>
+  </armgcccpp.compiler.symbols.DefSymbols>
+  <armgcccpp.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../../glow</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/FastLED</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries/LinkedList</Value>
+      <Value>C:/Program Files (x86)/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/libraries</Value>
+      <Value>C:/Users/Simon/Documents/Arduino/libraries</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/avr</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/util</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/utils</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy/../tools/arm/bin/../arm-none-eabi/include</Value>
+      <Value>C:/Program Files (x86)/Arduino/hardware/teensy</Value>
+    </ListValues>
+  </armgcccpp.compiler.directories.IncludePaths>
+  <armgcccpp.compiler.optimization.level>Optimize (-O1)</armgcccpp.compiler.optimization.level>
+  <armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcccpp.compiler.optimization.DebugLevel>Maximum (-g3)</armgcccpp.compiler.optimization.DebugLevel>
+  <armgcccpp.compiler.warnings.AllWarnings>True</armgcccpp.compiler.warnings.AllWarnings>
+  <armgcccpp.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </armgcccpp.linker.libraries.Libraries>
+  <armgcccpp.linker.libraries.LibrarySearchPaths>
+    <ListValues>
+      <Value>../cmsis/linkerScripts</Value>
+    </ListValues>
+  </armgcccpp.linker.libraries.LibrarySearchPaths>
+  <armgcccpp.linker.optimization.GarbageCollectUnusedSections>True</armgcccpp.linker.optimization.GarbageCollectUnusedSections>
+  <armgcccpp.linker.miscellaneous.LinkerFlags>-Tsamd21e18a_flash.ld</armgcccpp.linker.miscellaneous.LinkerFlags>
+  <armgcccpp.assembler.debugging.DebugLevel>Default (-g)</armgcccpp.assembler.debugging.DebugLevel>
+  <armgcccpp.preprocessingassembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel\Device\ATMEL\samd21\include</Value>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel</Value>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel\CMSIS\Include</Value>
+      <Value>%24(ToolchainDir)\..\..\CMSIS_Atmel\Device\ATMEL</Value>
+    </ListValues>
+  </armgcccpp.preprocessingassembler.general.IncludePaths>
+  <armgcccpp.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcccpp.preprocessingassembler.debugging.DebugLevel>
+</ArmGccCpp>
+    </ToolchainSettings>
+    <VMSETTING_IncludePaths>../../../glow;C:/Users/Simon/Documents/Arduino/libraries/FastLED;C:/Users/Simon/Documents/Arduino/libraries/LinkedList;C:/Program Files (x86)/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/teensy/avr/libraries;C:/Users/Simon/Documents/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/avr;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/util;C:/Program Files (x86)/Arduino/hardware/teensy/avr/cores/teensy3/utils;C:/Program Files (x86)/Arduino/hardware/teensy/../tools/arm/bin/../arm-none-eabi/include;C:/Program Files (x86)/Arduino/hardware/teensy;</VMSETTING_IncludePaths>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Animations.ino">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Communication.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Communication.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="I2C.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="I2C.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Pulse.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Pulse.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="UART.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="UART.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="__vm\.glow.vsarduino.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="glow.ino">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="PulseManager.ino">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="__vm\" />
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
