@@ -8,10 +8,19 @@
 
   Testing strips that are used are: ws2812 RGB strips.
   The final strips that are used are: ws2811 GRB strips. (current prototype strip is 40 leds big);
+  2 types of final strips:
+  wS2811 which is GRB
+  wS2811s is BRG
 */
 
-#define ID 3
+#include <LinkedList.h>
+#include "FastLED.h"
+#include "UART.h"
+#include "I2C.h"
+#include "Pulse.h"
 
+
+#define ID 1
 
 //Controller-Strip types
 //#if ID == 3
@@ -23,6 +32,7 @@
 #define FALL_FADER 30
 #define FPS 40
 /*
+ * Old led strip settings
 #else
 
 #define NUM_LEDS 600
@@ -262,13 +272,3 @@ void loop() {
     lastUpdate = millis();
   }
 };
-
-
-#define ID 1
-#include <LinkedList.h>
-#include "FastLED.h"
-#include "UART.h"
-#include "I2C.h"
-#include "Pulse.h"
-
-#define ID 3
