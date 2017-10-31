@@ -10,17 +10,11 @@
   The final strips that are used are: ws2811 GRB strips. (current prototype strip is 40 leds big);
 */
 
-#include <LinkedList.h>
-#include "FastLED.h"
-#include "UART.h"
-#include "I2C.h"
-#include "Pulse.h"
-
 #define ID 3
 
 
 //Controller-Strip types
-#if ID == 3
+//#if ID == 3
 #define NUM_LEDS 200
 #define BRIGHTNESS  125 //200
 #define FRAMES_PER_SECOND  1000
@@ -28,6 +22,7 @@
 #define PULSEFADER 40
 #define FALL_FADER 30
 #define FPS 40
+/*
 #else
 
 #define NUM_LEDS 600
@@ -38,7 +33,7 @@
 #define FALL_FADER 20
 #define FPS 1000
 #endif
-
+*/
 
 bool stripTypeNew; //This is used in pulse.h to determine the settings.
 int newStripIds[] {3}; //Adjust this together with precompiler if!
@@ -62,10 +57,10 @@ FASTLED_USING_NAMESPACE
 
 //Rest pulse vars
 //Pulse vars
-const int pulseHue = HUE_RED;
+const int pulseHue = 80;
 const int restPulseHue = 90;
 long lastRestPulseTime;
-const long RestPulseTime = 500;
+const long RestPulseTime = 2500;
 double pulse1Intensity = 1;
 double pulse2Intensity = 0.5;
 double pulse3Intensity = 0.2;
@@ -193,12 +188,12 @@ void readInput() {
 }
 
 void checkForStripType() {
-  stripTypeNew = false;
+  //stripTypeNew = false;
   // for (int i = 0; i < sizeof(newStripIds); i++) {
-  if (ID == 3) {
+  //if (ID == 3) {
     stripTypeNew = true;
     //  }
-  }
+  //}
 }
 
 void printStartupDebug() {
@@ -216,20 +211,20 @@ void setup() {
   //delay(3000); // 3 second delay for recovery
 
   checkForStripType();
-  if (stripTypeNew) {
+  //if (stripTypeNew) {
 
     FastLED.addLeds<WS2811, DATA0_PIN, GRB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  }
+  /*}
   else {
 
     FastLED.addLeds<WS2812, DATA0_PIN, RGB>(strips[0]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     FastLED.addLeds<WS2812, DATA1_PIN, RGB>(strips[1]->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  }
+  }*/
   //Set random seed
   randomSeed(analogRead(0));
   //FastLED.setBrightness(BRIGHTNESS);
-  Serial.begin(9600);
+    Serial.begin(9600);
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
   Pulses = LinkedList<Pulse*>();
@@ -259,6 +254,7 @@ void setup() {
 
 
 void loop() {
+//currentState = Synchronized;
   readInput();
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
@@ -267,3 +263,12 @@ void loop() {
   }
 };
 
+
+#define ID 1
+#include <LinkedList.h>
+#include "FastLED.h"
+#include "UART.h"
+#include "I2C.h"
+#include "Pulse.h"
+
+#define ID 3
