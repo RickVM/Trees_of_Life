@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "I2C.h"
 
-#define ID 1
+#define ID 3
 
 Communication* COM;
 
