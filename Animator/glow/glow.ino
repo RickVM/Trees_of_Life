@@ -20,7 +20,7 @@
 #include "Pulse.h"
 
 
-#define ID 1
+#define ID 3
 
 //Controller-Strip types
 //#if ID == 3

@@ -42,13 +42,29 @@ void Input::setInput(int pos, int x)
     {
       classificationArray[pos] = 1;//Add classification code here.
     }
-    else if (x < 7)
+    else if (x < 6)
     {
       classificationArray[pos] = 2;//Add classification code here.
     }
-    else
+    else if (x < 7)
     {
       classificationArray[pos] = 3;//Add classification code here.
+    }
+    else if (x < 8)
+    {
+      classificationArray[pos] = 4;//Add classification code here.
+    }
+    else if (x < 9)
+    {
+      classificationArray[pos] = 5;//Add classification code here.
+    }
+    else if (x < 10)
+    {
+      classificationArray[pos] = 6;//Add classification code here.
+    }
+    else
+    {
+      classificationArray[pos] = 7;//Add classification code here.
     }
   }
   else

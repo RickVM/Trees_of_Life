@@ -309,13 +309,25 @@ void Controller::Pulse(void)//Two inputs at the moment
       {
         switch (_input->getInputClassification(i)) {
           case 1:
-            this->M = "pulse1";
+            this->M = "pulse5";
             break;
           case 2:
-            this->M = "pulse2";
+            this->M = "pulse6";
             break;
           case 3:
-            this->M = "pulse3";
+            this->M = "pulse7";
+            break;
+          case 4:
+            this->M = "pulse8";
+            break;
+          case 5:
+            this->M = "pulse9";
+            break;
+          case 6:
+            this->M = "pulse10";
+            break;
+          case 7:
+            this->M = "pulse11";
             break;
         };
         COM->sendCommand((i + 1), M);
