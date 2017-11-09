@@ -10,6 +10,8 @@ void UART::Begin()
   Serial1.begin(this->_baudRate);
   Serial2.begin(this->_baudRate);
   Serial3.begin(this->_baudRate);
+  Serial.print("Using mode: ");
+  Serial.println(OldOrNew);
 }
 
 //Not needed for first prototype
@@ -87,25 +89,99 @@ COMMANDS UART::readCommand(int id)
   return rv;
 }
 
+/*
+   ID 1 & 2, 3 & 4, 5 & 6 go to the same teensy
+   Format message like #1pulse
+
+*/
+
 int UART::sendCommand(int id, String message)
 {
   int rv = 0;
-  switch (id) {
-    case 1:
-      Serial1.println(_format(message));
+  String tempMessage = "";
+  switch (OldOrNew) {
+    case 1: //Old
+      switch (id) {
+        case 1:
+          Serial1.println(_format(message));
+          break;
+        case 2:
+          Serial2.println(_format(message));
+          break;
+        case 3:
+          Serial3.println(_format(message));
+          break;
+        default:
+          rv = -1;
+          //Set error value, not inplemented yet
+          break;
+      }
       break;
-    case 2:
-      Serial2.println(_format(message));
-      break;
-    case 3:
-      Serial3.println(_format(message));
+    case 2: //New
+      switch (id) {
+        case 1:
+          //Send to teensy 1
+          tempMessage = "1";
+          tempMessage.concat(message);
+          Serial1.println(_format(tempMessage));
+          Serial.print("Sended = ");
+          Serial.print(tempMessage);
+          Serial.println(" to teensy 1.");
+          break;
+        case 2:
+          //Send to teensy 1
+          tempMessage = "2";
+          tempMessage.concat(message);
+          Serial1.println(_format(tempMessage));
+          Serial.print("Sended = ");
+          Serial.print(tempMessage);
+          Serial.println(" to teensy 1.");
+          break;
+        case 3:
+          //Send to teensy 2
+          tempMessage = "1";
+          tempMessage.concat(message);
+          Serial2.println(_format(tempMessage));
+          Serial.print("Sended = ");
+          Serial.print(tempMessage);
+          Serial.println(" to teensy 2.");
+          break;
+        case 4:
+          //Send to teensy 2
+          tempMessage = "2";
+          tempMessage.concat(message);
+          Serial2.println(_format(tempMessage));
+          Serial.print("Sended = ");
+          Serial.print(tempMessage);
+          Serial.println(" to teensy 2.");
+          break;
+        case 5:
+          //Send to teensy 3
+          tempMessage = "1";
+          tempMessage.concat(message);
+          Serial3.println(_format(tempMessage));
+          Serial.print("Sended = ");
+          Serial.print(tempMessage);
+          Serial.println(" to teensy 3.");
+          break;
+        case 6:
+          //Send to teensy 3
+          tempMessage = "2";
+          tempMessage.concat(message);
+          Serial3.println(_format(tempMessage));
+          Serial.print("Sended = ");
+          Serial.print(tempMessage);
+          Serial.println(" to teensy 3.");
+          break;
+        default:
+          //Not inplemented
+          break;
+      }
       break;
     default:
-      rv = -1;
-      //Set error value, not inplemented yet
+      //Not inplemented
       break;
   }
-  Serial.print("Sended message to: ");
-  Serial.println(id);
+  
   return rv;
 }

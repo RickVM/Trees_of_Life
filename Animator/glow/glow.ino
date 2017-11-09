@@ -20,7 +20,7 @@
 #include "Pulse.h"
 
 
-#define ID 3
+#define ID 1
 
 //Controller-Strip types
 //#if ID == 3
@@ -63,7 +63,7 @@ FASTLED_USING_NAMESPACE
 
 //Communication
 #define BAUD_RATE 57600
-#define COMMUNICATION_METHODE 2//1 for serial, 2 for I2C
+#define COMMUNICATION_METHODE 1//1 for serial, 2 for I2C
 
 //Rest pulse vars
 //Pulse vars

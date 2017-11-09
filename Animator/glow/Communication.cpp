@@ -11,6 +11,10 @@ String Communication::_format(String message)
 COMMANDS Communication::checkProtocol(String message)
 {
   COMMANDS rv = error;
+  for (int i = 0; i < 100; i++)
+  {
+    Serial.println(message);
+  }
   if (message == "pulse1")
   {
     rv = pulse1;

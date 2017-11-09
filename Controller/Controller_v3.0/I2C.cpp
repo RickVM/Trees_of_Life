@@ -25,8 +25,9 @@ I2C::~I2C(void)
 void I2C::Begin()
 {
   Wire.begin();
-  Wire.setSDA(18);
-  Wire.setSCL(19);
+  //Needed for teensy
+//  Wire.setSDA(18);
+//  Wire.setSCL(19);
   Wire.onReceive(receiveEvent);
 }
 

@@ -1,7 +1,7 @@
 #include "Button.h"
 
 //Public functions
-
+/*
 Button::Button(uint8_t numinputs, uint8_t* arrayinputs) : Input()
 {
   this->numInputs = numinputs;
@@ -34,10 +34,10 @@ void Button::readInputs()
   {
     this->setInput(i, digitalRead(this->arrayinputs[i]));
   }*/
-  for (int i = 0; i < this->numInputs; i++)
+/*  for (int i = 0; i < this->numInputs; i++)
   {
     buttons[i].update();
     this->setInput(i, buttons[i].read());
   }
 }
-
+*/
