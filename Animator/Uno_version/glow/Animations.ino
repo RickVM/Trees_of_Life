@@ -1,5 +1,5 @@
 void pulseFade() {
-  //Serial.println("FADING STRIPS IN PULSE/RESTPULSE MODE");
+  Serial.println("FADING STRISP  PULSE/RESTPULSE MODE");
   for (int i = 0; i < NUM_STRIPS; i++) {
     fadeToBlackBy(strips[i]->leds, NUM_LEDS, FADER);
   }

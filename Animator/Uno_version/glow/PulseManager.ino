@@ -39,7 +39,7 @@ void deleteRestPulse(int i) {
 //Does a tick for all pulses and deletes finished ones.
 void doPulse() {
   for (int i = 0; i < Pulses.size(); i++) {
-    //Serial.println("Doing a pulse in dopulse");
+    Serial.println("Doing a pulse in dopulse");
     if (Pulses.get(i)->tickSawWave()) { //tickSawWave
     }
     else {
@@ -64,8 +64,7 @@ void collapsePulse() {
 
 //Makes a new pulse for the strip
 void makePulse(int strip, double intensity) {
-  Serial.printf("Making a pulse with intensity: %f for: ", intensity);
-  Serial.println(strip);
+//  Serial.printf("Making a pulse with intensity: %f\n  ", intensity);
   Pulse * P = new Pulse(strips[strip]->leds, NUM_LEDS, pulseHue, intensity);
   Pulses.add(P);
   //Serial.println("Pulse made");

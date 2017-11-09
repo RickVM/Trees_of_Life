@@ -10,10 +10,18 @@ Pulse::Pulse(CRGB * StripLeds, int Num_leds, int Hue, double intensity) {
 
   //Temp so we can prototype with the old strips.
   //If id equals a new strip then use new strip settings
-  pulseSpeed = NEW_PULSESPEED;
-  fallSpeed = NEW_FALLSPEED;
-  firstWaveAmplitudeFactor = (NEW_FIRSTWAVEAMPLITUDEFACTOR * intensity);
-  secondWaveAmplitudeFactor = (NEW_SECONDWAVEAMPLITUDEFACTOR * intensity);
+  if (stripTypeNew) {
+    pulseSpeed = NEW_PULSESPEED;
+    fallSpeed = NEW_FALLSPEED;
+    firstWaveAmplitudeFactor = (NEW_FIRSTWAVEAMPLITUDEFACTOR * intensity);
+    secondWaveAmplitudeFactor = (NEW_SECONDWAVEAMPLITUDEFACTOR * intensity);
+  }
+  else {
+    pulseSpeed = OLD_PULSESPEED;
+    fallSpeed = OLD_FALLSPEED;
+    firstWaveAmplitudeFactor = (OLD_FIRSTWAVEAMPLITUDEFACTOR * intensity);
+    secondWaveAmplitudeFactor = (OLD_SECONDWAVEAMPLITUDEFACTOR * intensity);
+  }
 }
 
 //used for rest pulse
@@ -23,7 +31,12 @@ Pulse::Pulse(CRGB* StripLeds, int Num_leds, int Hue, int customIndex) {
   this->hue = Hue;
   pulseIndex = customIndex;
   pulseDec = pulseIndex;
-  restPulseSpeed = NEW_RESTPULSESPEED;
+  if (stripTypeNew) {
+    restPulseSpeed = NEW_RESTPULSESPEED;
+  }
+  else {
+    restPulseSpeed = OLD_RESTPULSESPEED;
+  }
   startTime = millis();
 }
 

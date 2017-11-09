@@ -13,33 +13,19 @@
   wS2811s is BRG
 */
 
-
 #include <LinkedList.h>
 #include "FastLED.h"
 #include "UART.h"
 #include "I2C.h"
 #include "Pulse.h"
 
-FASTLED_USING_NAMESPACE
 
-#define ID 1
-
-//Pinout
-//Brown and blue
-#define DATA1_PIN 2
-#define DATA2_PIN 14
-#define DATA3_PIN 7
-#define DATA4_PIN 8
-
-#define DATA5_PIN 6
-#define DATA6_PIN 20
-#define DATA7_PIN 21
-#define DATA8_PIN 5
+#define ID 3
 
 //Controller-Strip types
-#define NUM_STRIPS 4 //When adjusting this, remember to also comment/uncomment FastLED.addleds in setup, and the ledstrip* array!!
+//#if ID == 3
 #define NUM_LEDS_PER_STRIP 100
-#define NUM_LEDS NUM_LEDS_PER_STRIP*2 //2 strips high
+#define NUM_LEDS NUM_LEDS_PER_STRIP
 #define BRIGHTNESS  125 //200
 #define FRAMES_PER_SECOND  40
 #define FADER 40
@@ -47,15 +33,34 @@ FASTLED_USING_NAMESPACE
 #define FALL_FADER 30
 #define FPS 40
 
+bool stripTypeNew; //This is used in pulse.h to determine the settings.
+int newStripIds[] {3}; //Adjust this together with precompiler if!
+
+
 //Program assumes all used led strips to contain the same properties as listed below.
+FASTLED_USING_NAMESPACE
 
+//6m is 360, 7m is 420, 10M is 600
 
+//Pinout
+//Brown and blue
+//0 and 3 1 and 4 are couples
+#define NUM_STRIPS 1 //When adjusting this, remember to also comment/uncomment FastLED.addleds in setup, and the ledstrip* array!!
+#define DATA0_PIN 2
+#define DATA1_PIN 14
+#define DATA3_PIN 7
+#define DATA4_PIN 8
+
+#define DATA5_PIN 6
+#define DATA6_PIN 20
+#define DATA7_PIN 21
+#define DATA8_PIN 5
 #define LED 13
 
 struct ledstrip {
-  CRGB leds[(NUM_LEDS)];
-} strip1, strip2, strip3, strip4; //Change this when adjusting the nr of ledstrips!
-ledstrip* strips[] = {&strip1, &strip2, &strip3, &strip4}; //This also!
+  CRGB leds[(NUM_LEDS_PER_STRIP)];
+} strip1; //Change this when adjusting the nr of ledstrips!
+ledstrip* strips[] = {&strip1}; //This also!
 
 //Communication
 #define BAUD_RATE 57600
@@ -69,7 +74,6 @@ const int pulseHue = 225;
 const int restPulseHue = 90;
 long lastRestPulseTime;
 const long RestPulseTime = 2500;
-
 double pulse5Intensity = 1;
 double pulse6Intensity = 0.7;
 double pulse7Intensity = 0.5;
@@ -199,32 +203,41 @@ void readInput() {
   }
 }
 
+void checkForStripType() {
+  //stripTypeNew = false;
+  // for (int i = 0; i < sizeof(newStripIds); i++) {
+  //if (ID == 3) {
+  stripTypeNew = true;
+  //  }
+  //}
+}
 
 void printStartupDebug() {
   Serial.print("ID:\t");
   Serial.println(ID);
+  Serial.print("Strip type:\t");
+  if (stripTypeNew) {
+    Serial.println("WS2811(New)");
+  }
+  else {
+    Serial.println("WS2812(Old)");
+  }
 }
-
 void setup() {
   //delay(3000); // 3 second delay for recovery
-  //wS2811 which is GRB
-  //wS2811s is BRG
-  //Couple 1
-  FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[0]->leds, 0, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA2_PIN, GRB>(strips[0]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+
+  checkForStripType();
+  FastLED.addLeds<WS2811, DATA5_PIN, GRB>(strips[0]->leds, 0, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  //FastLED.addLeds<WS2811, DATA3_PIN, GRB>(strips[0]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
   //Couple 2
+  //FastLED.addLeds<WS2811, DATA6_PIN, GRB>(strips[1]->leds, 0,  NUM_LEDS).setCorrection(TypicalLEDStrip);
+  //FastLED.addLeds<WS2811, DATA4_PIN, GRB>(strips[1]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
 
-  FastLED.addLeds<WS2811, DATA3_PIN, GRB>(strips[1]->leds, 0,  NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA4_PIN, GRB>(strips[1]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-
-  //Couple 3
-  FastLED.addLeds<WS2811, DATA5_PIN, GRB>(strips[2]->leds, 0,  NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA6_PIN, GRB>(strips[2]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-
-  //Couple 4
-  FastLED.addLeds<WS2811, DATA7_PIN, GRB>(strips[3]->leds, 0, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA8_PIN, GRB>(strips[3]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-
+  //FastLED.addLeds<WS2811, DATA7_PIN, GRB>(strips[2]->leds, 0, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  //FastLED.addLeds<WS2811, DATA7_PIN, GRB>(strips[2]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  //Couple 2
+  //FastLED.addLeds<WS2811, DATA8_PIN, GRB>(strips[3]->leds, 0,  NUM_LEDS).setCorrection(TypicalLEDStrip);
+ // FastLED.addLeds<WS2811, DATA8_PIN, GRB>(strips[3]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
   //Set random seed
   randomSeed(analogRead(0));
   //FastLED.setBrightness(BRIGHTNESS);
@@ -236,7 +249,7 @@ void setup() {
 
   resetStrips();
   FastLED.show();
-
+/*
   //Communication
   switch (COMMUNICATION_METHODE) {
     case 1:
@@ -247,6 +260,7 @@ void setup() {
       break;
   };
   COM->Begin();
+  */
   currentState = Pulsing;
   lastRestPulseTime = 0;
   //fillStripWithColorTemp();
@@ -257,11 +271,11 @@ void setup() {
 }
 
 void loop() {
-  //currentState = Synchronized;
+  currentState = Synchronized;
   //doTestPulses();
   //currentState = Pulsing;
 
-  readInput();
+  //readInput();
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
     executeState();

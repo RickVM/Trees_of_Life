@@ -15,6 +15,13 @@ extern bool stripTypeNew;
 #define NEW_SECONDWAVEAMPLITUDEFACTOR 2.6
 #define NEW_RESTPULSESPEED 1
 
+//used with the old strips
+#define OLD_PULSESPEED 3
+#define OLD_FALLSPEED 3
+#define OLD_FIRSTWAVEAMPLITUDEFACTOR 2
+#define OLD_SECONDWAVEAMPLITUDEFACTOR 1.3
+#define OLD_RESTPULSESPEED 1
+
 class Pulse {
   private:
     int num_leds;
