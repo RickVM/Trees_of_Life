@@ -11,47 +11,57 @@ String Communication::_format(String message)
 COMMANDS Communication::checkProtocol(String message)
 {
   COMMANDS rv = error;
-  if (message == "pulse5")
+  //Strip message of number
+  char h = message.charAt(0);
+  this->hand = (int)h;
+  //Save number as hand var
+  String tempMessage = message.substring(1);
+  if (tempMessage == "pulse5")
   {
     rv = pulse5;
   }
-  else if (message == "pulse6")
+  else if (tempMessage == "pulse6")
   {
     rv = pulse6;
   }
-  else if (message == "pulse7")
+  else if (tempMessage == "pulse7")
   {
     rv = pulse7;
   }
-  if (message == "pulse8")
+  if (tempMessage == "pulse8")
   {
     rv = pulse8;
   }
-  else if (message == "pulse9")
+  else if (tempMessage == "pulse9")
   {
     rv = pulse9;
   }
-  else if (message == "pulse10")
+  else if (tempMessage == "pulse10")
   {
     rv = pulse10;
   }
-  else if (message == "pulse11")
+  else if (tempMessage == "pulse11")
   {
     rv = pulse11;
   }
-  else if (message == "flash")
+  else if (tempMessage == "flash")
   {
     rv = flash;
   }
-  else if (message == "backward")
+  else if (tempMessage == "backward")
   {
     rv = backward;
   }
-  else if (message == "rest")
+  else if (tempMessage == "rest")
   {
     rv = rest;
   }
   message = "";
   return rv;
+}
+
+int Communication::getHand(void)
+{
+  return this->hand;
 }
 

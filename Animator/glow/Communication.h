@@ -18,6 +18,8 @@ enum COMMANDS {
 
 class Communication
 {
+  private:
+    int hand;
   public:
 
     virtual void Begin() = 0;
@@ -26,5 +28,6 @@ class Communication
 
     String _format(String message);
     COMMANDS checkProtocol(String message);
+    int getHand(void);
 };
 

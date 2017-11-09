@@ -161,6 +161,8 @@ void mPulse(double intensity) {
 
 void readInput() {
   COMMANDS x = COM->readCommand(ID);
+  //Get hand, return int for wich hand 
+  int y = COM->getHand();//Could be 1 or 2
   switch (x) {
     case error:
       //Do nothing
