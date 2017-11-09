@@ -11,31 +11,47 @@ String Communication::_format(String message)
 COMMANDS Communication::checkProtocol(String message)
 {
   COMMANDS rv = error;
-  if(message == "pulse1")
+  if (message == "pulse5")
   {
-    rv = pulse1;
+    rv = pulse5;
   }
-  else if(message == "pulse2")
+  else if (message == "pulse6")
   {
-    rv = pulse2;
+    rv = pulse6;
   }
-  else if(message == "pulse3")
+  else if (message == "pulse7")
   {
-    rv = pulse3;
+    rv = pulse7;
   }
-  else if(message == "flash")
+  else if (message == "pulse8")
+  {
+    rv = pulse8;
+  }
+  else if (message == "pulse9")
+  {
+    rv = pulse9;
+  }
+  else if (message == "pulse10")
+  {
+    rv = pulse10;
+  }
+  else if (message == "pulse11")
+  {
+    rv = pulse11;
+  }
+  else if (message == "flash")
   {
     rv = flash;
   }
-  else if(message == "backward")
+  else if (message == "backward")
   {
     rv = backward;
   }
-  else if(message == "rest")
+  else if (message == "rest")
   {
     rv = rest;
   }
-  message = ""; 
-  return rv; 
+  message = "";
+  return rv;
 }
 

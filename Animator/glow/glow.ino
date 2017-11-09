@@ -22,7 +22,7 @@
 
 FASTLED_USING_NAMESPACE
 
-#define ID 1
+#define ID 3
 
 //Pinout
 //Brown and blue
