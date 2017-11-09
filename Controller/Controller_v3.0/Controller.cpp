@@ -264,29 +264,29 @@ bool Controller::checkSync()
 void Controller::syncStop(void)
 {
   this->currentTime = millis();
- /* for (int i = 1; i < this->numberAnimators; i++)
-  {
-    finalAdjustment[i] = oldTime[0] - oldTime[i];
-    Serial.print("Time difference: ");
-    Serial.print(finalAdjustment[i]);
-    Serial.print(" of : ");
-    Serial.println(i);
-  }
-
-   if (this->checkSyncStop())
+  /* for (int i = 1; i < this->numberAnimators; i++)
     {
-     for (int i = 0; i < 6; i++)
-     {
-       pulseTime[i] = PULSE_TIME;
-     }
-     for (int k = 1; k < 6; k++)
-     {
-       pulseTime[k] += finalAdjustment[k];
-       finalSync[k] = true;
-     }
+     finalAdjustment[i] = oldTime[0] - oldTime[i];
+     Serial.print("Time difference: ");
+     Serial.print(finalAdjustment[i]);
+     Serial.print(" of : ");
+     Serial.println(i);
     }
+
+    if (this->checkSyncStop())
+     {
+      for (int i = 0; i < 6; i++)
+      {
+        pulseTime[i] = PULSE_TIME;
+      }
+      for (int k = 1; k < 6; k++)
+      {
+        pulseTime[k] += finalAdjustment[k];
+        finalSync[k] = true;
+      }
+     }
   */
-  
+
   long timeDifference = oldTime[0] - oldTime[1];
   if (timeDifference < 20 && timeDifference > -20 && timeDifference != 0)//Stop adjusting whenever the difference between pulses is less than 20
   {
@@ -333,13 +333,13 @@ void Controller::Pulse(void)//Two inputs at the moment
         COM->sendCommand((i + 1), M);
         this->oldTime[i] = this->currentTime;
         /*if (finalAdjustment[i] < 20 && finalAdjustment[i] > -20 && finalAdjustment[i] != 0)//Stop adjusting whenever the difference between pulses is less than 20
-        {
+          {
           for (int i = 0; i < 6; i ++)
           {
             pulseTime[i] = PULSE_TIME;
           }
           //Add a final correction to get them perfectly synced.
-        }*/
+          }*/
       }
     }
   }
@@ -347,18 +347,26 @@ void Controller::Pulse(void)//Two inputs at the moment
 
 void Controller::LetGo(void)
 {
-  for (int i = 1; i <= this->numberAnimators; i++)
-  {
+  COM->sendCommand(1, "backward");//Teensy 1
+  COM->sendCommand(3, "backward");//Teensy 2
+  COM->sendCommand(5, "backward");//Teensy 3
+  /*for (int i = 1; i <= this->numberAnimators; i++)
+    {
     COM->sendCommand(i, "backward");
-  }
+    }*/
 }
 
 void Controller::Flash(void)
 {
-  for (int i = 1; i <= this->numberAnimators; i++)
-  {
+  //Send to all three teensy's
+  COM->sendCommand(1, "flash");//Teensy 1
+  COM->sendCommand(3, "flash");//Teensy 2
+  COM->sendCommand(5, "flash");//Teensy 3
+  /*
+    for (int i = 1; i <= this->numberAnimators; i++)
+    {
     COM->sendCommand(i, "flash");
-  }
+    }*/
 }
 
 void Controller::Reset(void)
