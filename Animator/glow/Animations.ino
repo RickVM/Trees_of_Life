@@ -1,9 +1,4 @@
-void pulseFade() {
-  //Serial.println("FADING STRIPS IN PULSE/RESTPULSE MODE");
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    fadeToBlackBy(strips[i]->leds, NUM_LEDS, FADER);
-  }
-}
+#include "AnimationSettings.h"
 
 //Preps strip for beats, beats and resets strip
 void valveBeat() {
@@ -27,7 +22,7 @@ void beat() {
   int b = 0;
   int x = beatBrightness / beatFrames;
 
-  for (int i = 0; i < beatFrames; i++) { 
+  for (int i = 0; i < beatFrames; i++) {
     FastLED.setBrightness(b += x);
     FastLED.show();
     FastLED.delay(beatDelay);
@@ -37,28 +32,20 @@ void beat() {
     FastLED.show();
     FastLED.delay(beatDelay);
   }
-  
-  /*
-  //Now do half so we dont turn the leds off but dim them
-  Also set beatframes -1 in the above loop!
-  FastLED.setBrightness(b -= (x / 2));
-  FastLED.show();
-  FastLED.delay(beatDelay);
-  */
 }
 
 //Sub-function that sets the right color for beats.
 void setColourForTreeBeat() {
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int j = 0; j < NUM_LEDS; j++) {
-     strips[i]->leds[j] = CRGB(flashR, flashG, flashB);
+  for (int i = 0; i < NUM_STRIPS_TOTAL; i++) {
+    for (int j = 0; j < strips[i]->nrOfLeds; j++) {
+      strips[i]->leds[j] = CRGB(flashR, flashG, flashB);
     }
   }
 }
 
 void resetStrips() {
-  for (int j = 0; j < NUM_STRIPS; j++) {
-    for (int i = 0; i < NUM_LEDS; i++) {
+  for (int j = 0; j < NUM_STRIPS_TOTAL; j++) {
+    for (int i = 0; i < strips[i]->nrOfLeds; i++) {
       strips[j]->leds[i] = CRGB(0, 0, 0);
     }
   }

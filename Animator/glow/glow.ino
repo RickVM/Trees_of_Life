@@ -14,193 +14,189 @@
 */
 
 
-#include <LinkedList.h>
 #include "FastLED.h"
+#include "ledstrips.h"
+#include "Hand.h"
 #include "UART.h"
 #include "I2C.h"
-#include "Pulse.h"
+
+
 
 FASTLED_USING_NAMESPACE
 
 #define ID 3
-
-//Pinout
-//Brown and blue
-#define DATA1_PIN 2
-#define DATA2_PIN 14
-#define DATA3_PIN 7
-#define DATA4_PIN 8
-
-#define DATA5_PIN 6
-#define DATA6_PIN 20
-#define DATA7_PIN 21
-#define DATA8_PIN 5
-
-//Controller-Strip types
-#define NUM_STRIPS 4 //When adjusting this, remember to also comment/uncomment FastLED.addleds in setup, and the ledstrip* array!!
-#define NUM_LEDS_PER_STRIP 100
-#define NUM_LEDS NUM_LEDS_PER_STRIP*2 //2 strips high
-#define BRIGHTNESS  125 //200
-#define FRAMES_PER_SECOND  40
-#define FADER 40
-#define PULSEFADER 40
-#define FALL_FADER 30
-#define FPS 40
-
-//Program assumes all used led strips to contain the same properties as listed below.
-
-
 #define LED 13
 
-struct ledstrip {
-  CRGB leds[(NUM_LEDS)];
-} strip1, strip2, strip3, strip4; //Change this when adjusting the nr of ledstrips!
-ledstrip* strips[] = {&strip1, &strip2, &strip3, &strip4}; //This also!
 
 //Communication
 #define BAUD_RATE 57600
 #define COMMUNICATION_METHODE 1//1 for serial, 2 for I2C
 Communication* COM;
 
-unsigned long desyncTime = 8000;
-//Rest pulse vars
-//Pulse vars
-const int pulseHue = 225;
-const int restPulseHue = 90;
-long lastRestPulseTime;
-const long RestPulseTime = 2500;
-
-double pulse5Intensity = 1;
-double pulse6Intensity = 0.7;
-double pulse7Intensity = 0.5;
-double pulse8Intensity = 0.3;
-double pulse9Intensity = 0.25;
-double pulse10Intensity = 0.2;
-double pulse11Intensity = 0.1;
-
-
-enum currentStates {
-  Rest,
-  Pulsing,
+enum globalState {
+  Normal,
   Synchronized,
-  DeSync
-};
-currentStates currentState;
+  Desynchronized
+} GlobalState;
 
+ledstrip Strip1;
+ledstrip Strip2;
+ledstrip Strip3;
+ledstrip Strip4; //Change this when adjusting the nr of ledstrips!
+ledstrip* strips[] = {&Strip1, &Strip2, &Strip3, &Strip4}; //This also!
+ledstrip* hand1Strips[] = {&Strip1, &Strip2};
+ledstrip* hand2Strips[] = {&Strip3, &Strip4};
+
+Hand* hand1;
+Hand* hand2;
+Hand* hands[] = {hand1, hand2};
+Hand* activeHand = NULL;
+
+void setupHands() {
+  //constructor: Hand(ledstrip* Strips[], int NrOfStrips);
+  hand1 = new Hand(hand1Strips, NUM_STRIPS_PER_HAND);
+  hand2 = new Hand(hand2Strips, NUM_STRIPS_PER_HAND);
+  Serial.println("Finished setting up hands");
+}
 long lastUpdate = 0;
 
-//Beat Flash vars
-const int nrOfBeats = 4;
-const int nrOfFlashes = 1;
-const int beatFrames = 10; //Number of frames used in the brightness transition
-const int beatDelay = 18; //Delay between each frame
-const int beatBrightness = 100; // Total brightness the flash reaches.
-const int flashSpeed = 10;
-const int flashR = 255;
-const int flashG = 0;
-const int flashB = 0;
-const int smallValveDelay = 10;
-const int bigValveDelay = 450;
-
-LinkedList<Pulse *> Pulses;
-LinkedList<Pulse *> RestPulses;
 
 void executeState() {
-  //Serial.print("Executing state: \t");
-  switch (currentState) {
-    case Rest:
-      //Serial.println("Rest");
-      pulseFade();
-      fakeRestPulse(); //For test purposes
-      doRestPulse();
-      FastLED.show();
-      break;
-    case Pulsing:
-      //Serial.println("Pulsing");
-      if (Pulses.size() == 0) {
-        currentState = Rest;
-        return;
+  Serial.print("Executing state:\t");
+  switch (GlobalState) {
+    case Normal:
+      Serial.println("Normal");
+      for (int i = 0; i < NUM_HANDS; i++) {
+        //hands[i]->executeState();
       }
-      pulseFade();
-      doPulse();     //fillStripWithColor();
       FastLED.show();
       break;
     case Synchronized:
-      //Serial.println("Synced");
-      //flash state (flash)
+      Serial.println("Synchronized");
+      for (int i = 0; i < NUM_HANDS; i++) {
+        //hands[i]->deletePulses();
+      }
       valveBeat();
-      currentState = Pulsing;
+      for (int i = 0; i < NUM_HANDS; i++) {
+        //hands[i]->setState(Rest);
+      }
+      GlobalState = Normal;
       break;
 
-    case DeSync:
-      //Serial.println("Desync");
+    case Desynchronized:
+      Serial.println("Desynchronized");
       unsigned long startTime = millis();
       while ((desyncTime + startTime)  > millis()) {
-        for (int i = 0; i < NUM_STRIPS; i++) {
+        for (int i = 0; i < NUM_STRIPS_TOTAL; i++) {
           fadeToBlackBy(strips[i]->leds, NUM_LEDS, FALL_FADER);
         }
-        collapsePulse(); //Gets all existing pulses from a list and collapses them.
+        for (int i = 0; i < NUM_HANDS; i++) {
+          hands[i]->collapsePulse(); //Gets all existing pulses from a list and collapses them.
+        }
         FastLED.show();
       }
-      currentState = Pulsing;
+      //maybe add a check here if all pulses have been collapsed; if not keep looping?
+      GlobalState = Normal;
       break;
-  }
-}
-
-void mPulse(double intensity) {
-  if (currentState == Rest) {
-    currentState = Pulsing;
-  }
-  if (currentState == Pulsing) { //Only if in pulse or rest state. When moving this to another file, dont forget to make currentState extern!
-    //MAKE 1 PULSE FOR EACH STRIP
-    for (int i = 0; i < NUM_STRIPS; i++) {
-      makePulse(i, intensity);
-    }
   }
 }
 
 void readInput() {
   COMMANDS x = COM->readCommand(ID);
-  //Get hand, return int for wich hand 
+  //Get hand, return int for wich hand
   int y = COM->getHand();//Could be 1 or 2
-  switch (x) {
-    case error:
-      //Do nothing
-      break;
-    case pulse5:
-      mPulse(pulse5Intensity);
-      break;
-    case pulse6:
-      mPulse(pulse6Intensity);
-      break;
-    case pulse7:
-      mPulse(pulse7Intensity);
-      break;
-    case pulse8:
-      mPulse(pulse8Intensity);
-      break;
-    case pulse9:
-      mPulse(pulse9Intensity);
-      break;
-    case pulse10:
-      mPulse(pulse10Intensity);
-      break;
-    case pulse11:
-      mPulse(pulse11Intensity);
-      break;
-    case flash:
-      deletePulses();
-      currentState = Synchronized;
-      break;
-    case backward:
-      currentState = DeSync;
-      break;
-    case rest:
-      //do nothing
-      break;
+  if (y == 0) { //0 stands for all hands
+    switch (x) {
+      case error:
+        //do nothing
+        break;
+      case flash:
+        for (int i = 0; i < NUM_HANDS; i++) {
+          hands[i]->deletePulses();
+        }
+        GlobalState = Synchronized;
+        break;
+      case backward:
+        GlobalState = Desynchronized;
+        break;
+      default:
+        Serial.println("WARNING: INVALID COMMAND TYPE");
+        //Do nothing
+        break;
+    }
+  }
+  else {
+    activeHand = hands[y - 1]; //Set the global active hand for other functions
+    switch (x) {
+      case error:
+        //Do nothing
+        break;
+      case pulse5:
+        activeHand->makePulses(pulse5Intensity);
+        break;
+      case pulse6:
+        activeHand->makePulses(pulse6Intensity);
+        break;
+      case pulse7:
+        activeHand->makePulses(pulse7Intensity);
+        break;
+      case pulse8:
+        activeHand->makePulses(pulse8Intensity);
+        break;
+      case pulse9:
+        activeHand->makePulses(pulse9Intensity);
+        break;
+      case pulse10:
+        activeHand->makePulses(pulse10Intensity);
+        break;
+      case pulse11:
+        activeHand->makePulses(pulse11Intensity);
+        break;
+      case rest:
+        //do nothing (not implemented controller side)
+        break;
+      default:
+        Serial.println("WARNING: INVALID COMMAND TYPE");
+        //Do nothing
+        break;
+
+    }
   }
 }
 
+void setupLedStrips() {
+  Serial.println("Setting up led strips");
+
+  Strip1.nrOfLeds = NUM_LEDS_1A + NUM_LEDS_1B;
+  Strip2.nrOfLeds = NUM_LEDS_2A + NUM_LEDS_2B;
+  Strip3.nrOfLeds = NUM_LEDS_3A + NUM_LEDS_3B;
+  Strip4.nrOfLeds = NUM_LEDS_4A + NUM_LEDS_4B;
+
+  Strip1.leds = new CRGB[(Strip1.nrOfLeds)];
+  Strip2.leds = new CRGB[(Strip2.nrOfLeds)];
+  Strip3.leds = new CRGB[(Strip3.nrOfLeds)];
+  Strip4.leds = new CRGB[(Strip4.nrOfLeds)];
+
+  //wS2811 is GRB
+  //wS2811s is BRG
+  //Couple 1
+  FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[0]->leds, 0, NUM_LEDS_1A).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA2_PIN, GRB>(strips[0]->leds, NUM_LEDS_1A, NUM_LEDS_1B).setCorrection(TypicalLEDStrip);
+
+  //Couple 2
+  FastLED.addLeds<WS2811, DATA3_PIN, GRB>(strips[1]->leds, 0,  NUM_LEDS_2A).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA4_PIN, GRB>(strips[1]->leds, NUM_LEDS_2A, NUM_LEDS_2B).setCorrection(TypicalLEDStrip);
+
+  //Couple 3
+  FastLED.addLeds<WS2811, DATA5_PIN, GRB>(strips[2]->leds, 0,  NUM_LEDS_3A).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA6_PIN, GRB>(strips[2]->leds, NUM_LEDS_3A, NUM_LEDS_3B).setCorrection(TypicalLEDStrip);
+
+  //Couple 4
+  FastLED.addLeds<WS2811, DATA7_PIN, GRB>(strips[3]->leds, 0, NUM_LEDS_4A).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA8_PIN, GRB>(strips[3]->leds, NUM_LEDS_4A, NUM_LEDS_4B).setCorrection(TypicalLEDStrip);
+
+  Serial.println("Fininshed setting up led strips");
+}
 
 void printStartupDebug() {
   Serial.print("ID:\t");
@@ -208,34 +204,14 @@ void printStartupDebug() {
 }
 
 void setup() {
-  //delay(3000); // 3 second delay for recovery
-  //wS2811 which is GRB
-  //wS2811s is BRG
-  //Couple 1
-  FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[0]->leds, 0, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA2_PIN, GRB>(strips[0]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-  //Couple 2
-
-  FastLED.addLeds<WS2811, DATA3_PIN, GRB>(strips[1]->leds, 0,  NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA4_PIN, GRB>(strips[1]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-
-  //Couple 3
-  FastLED.addLeds<WS2811, DATA5_PIN, GRB>(strips[2]->leds, 0,  NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA6_PIN, GRB>(strips[2]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-
-  //Couple 4
-  FastLED.addLeds<WS2811, DATA7_PIN, GRB>(strips[3]->leds, 0, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA8_PIN, GRB>(strips[3]->leds, NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-
-  //Set random seed
-  randomSeed(analogRead(0));
-  //FastLED.setBrightness(BRIGHTNESS);
-  Serial.begin(9600);
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
-  Pulses = LinkedList<Pulse*>();
-  RestPulses = LinkedList<Pulse*>();
+  delay(2500);
 
+  Serial.begin(9600);
+  randomSeed(analogRead(0));
+  setupLedStrips();
+  setupHands();
   resetStrips();
   FastLED.show();
 
@@ -249,21 +225,30 @@ void setup() {
       break;
   };
   COM->Begin();
-  currentState = Pulsing;
-  lastRestPulseTime = 0;
+  GlobalState = Normal;
   //fillStripWithColorTemp();
   delay(500);
   printStartupDebug();
-  FastLED.show();
-  delay(2500);
+  //FastLED.show();
+  Serial.println("Startup complete.");
 }
 
-void loop() {
-  //currentState = Synchronized;
-  //doTestPulses();
-  //currentState = Pulsing;
+void TestPulses() {
+  for (int i = 0; i < NUM_HANDS; i++) {
+    hands[i]->doTestPulses();
+  }
+}
 
-  readInput();
+
+void loop() {
+  //Test case 1
+  GlobalState = Synchronized;
+  //Test case 2
+  //TestPulses();
+  //currentState = Normal;
+  
+  //readInput();
+  
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
     executeState();
