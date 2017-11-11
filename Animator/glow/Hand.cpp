@@ -28,7 +28,7 @@ void Hand::makePulses(double intensity) {
     Serial.println(nrOfStrips);
     for (int i = 0; i < nrOfStrips; i++) {
       Serial.println("Going to make a pulse");
-      //makePulse(i, intensity);
+      makePulse(i, intensity);
     }
   }
 }

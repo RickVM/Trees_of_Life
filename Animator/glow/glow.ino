@@ -234,7 +234,7 @@ void setup() {
   //fillStripWithColorTemp();
   delay(500);
   printStartupDebug();
-  //FastLED.show();
+  FastLED.show();
   Serial.println("Startup complete.");
 }
 
@@ -244,10 +244,10 @@ void TestPulses() {
   if ((lastTestPulseTime + 2500 ) < Time)
   {
     Serial.println("Making test pulse");
-    for (int i = 0; i < 2; i++) {
-      //hands[i]->testMakePulses(1);
-      hands[i]->makePulse(0, 1);
-      hands[i]->doPulse();
+    for (int i = 0; i < NUM_HANDS; i++) {
+      hands[i]->testMakePulses(i);
+      //hands[i]->makePulse(0, 1);
+      //hands[i]->doPulse();
     }
     lastTestPulseTime = Time;
   }
@@ -257,12 +257,12 @@ void loop() {
   //Test case 1
   //GlobalState = Synchronized;
   //Test case 2
-  //readInput();
+  TestPulses();
+    //readInput();
 
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
-    //hand1->Test();
-    TestPulses();
+
     executeState();
     lastUpdate = millis();
   }

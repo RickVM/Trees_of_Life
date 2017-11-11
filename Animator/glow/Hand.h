@@ -8,21 +8,19 @@
 
 class Hand {
   private:
-
     handState currentState;
-    
     ledstrip* strips[2];
     int nrOfStrips;
     LinkedList<Pulse *> Pulses;
     LinkedList<Pulse *> RestPulses;
-
     long lastRestPulseTime;
-    
+
     void deletePulse(int i);//Deletes a pulse at the given index from the pulses list
     void deleteRestPulse(int i); //Deletes a pulse at the given index from the pulses list
     void makeRestPulse(int strip);
     void pulseFade(); //Fades active strips
-    
+    void makePulse(int strip, double intensity); //Makes a new pulse for the strip
+    void doPulse(); //Does a tick for all regular pulses and deletes finished ones.
     void doRestPulse();  //Does a tick for all test pulses and deletes finished ones.
 
   public:
@@ -40,9 +38,7 @@ class Hand {
     void makeTestPulses();
     void Test();
 
-    
-    void makePulse(int strip, double intensity); //Makes a new pulse for the strip
-    void doPulse(); //Does a tick for all regular pulses and deletes finished ones.
+
 
 };
 
