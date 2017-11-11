@@ -42,6 +42,7 @@ uint8_t triggerArray[6] = {22, 20, 18, 16, 14, 11};//zwart kabel en wit tape, of
 
 void setup()
 {
+  delay(10);
   Serial.begin(9600);//Just for debugging.
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
