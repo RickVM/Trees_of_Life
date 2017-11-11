@@ -4,19 +4,18 @@
 #include "Pulse.h"
 #include "Ledstrips.h"
 #include "AnimationSettings.h"
-
-enum handState {
-  Rest,
-  Pulsing,
-};
+#include "Enums.h"
 
 class Hand {
   private:
-    ledstrip** strips;
+
+    handState currentState;
+    
+    ledstrip* strips[2];
     int nrOfStrips;
     LinkedList<Pulse *> Pulses;
     LinkedList<Pulse *> RestPulses;
-    handState currentState;
+
     long lastRestPulseTime;
     void makePulse(int strip, double intensity); //Makes a new pulse for the strip
     void deletePulse(int i);//Deletes a pulse at the given index from the pulses list
@@ -27,7 +26,8 @@ class Hand {
     void doRestPulse();  //Does a tick for all test pulses and deletes finished ones.
 
   public:
-    Hand(ledstrip** Strips, int NrOfStrips);
+
+    Hand(ledstrip* Strip1, ledstrip* Strip2, int NrOfStrips);
     void setState(handState state);
     void executeState();
     void fakeRestPulse(); //For test purposes
@@ -37,6 +37,8 @@ class Hand {
 
     //Triggers makepulse every pulseTime seconds
     //Used for automatic testing purposes
-    void doTestPulses();
+    void makeTestPulses();
+    void Test();
+
 };
 

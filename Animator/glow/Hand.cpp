@@ -1,24 +1,34 @@
 #include "Hand.h"
 
-Hand::Hand(ledstrip** Strips, int NrOfStrips)
+Hand::Hand(ledstrip* Strip1, ledstrip* Strip2, int NrOfStrips)
 {
-  strips = Strips;
-  NrOfStrips = nrOfStrips;
-  Pulses = LinkedList<Pulse*>();
-  RestPulses = LinkedList<Pulse*>();
+  //strips[0] = Strip1;
+  //strips[1] = Strip2;
+  //Pulses = LinkedList<Pulse*>();
+  //RestPulses = LinkedList<Pulse*>();
+  Serial.println(currentState);
   currentState = Rest;
-  lastRestPulseTime = 0;
+  Serial.println(currentState);
+    lastRestPulseTime = 0;
   Serial.println("Constructed a hand");
 }
 
 void Hand::makePulses(double intensity) {
-  if (currentState == Rest) {
-    currentState = Pulsing;
+  Serial.println("Makepulses");
+  Serial.print("State before doing something:\t");
+  Serial.println(this->currentState);
+  if (this->currentState == Rest) {
+    Serial.println("Detecting rest state with a pulse; changing to pulse state");
+      this->currentState = Pulsing;
+    Serial.println("State Changed");
   }
-  if (currentState == Pulsing) { //Only if in pulse or rest state. When moving this to another file, dont forget to make currentState extern!
+  if (this->currentState == Pulsing) { //Only if in pulse or rest state. When moving this to another file, dont forget to make currentState extern!
     //MAKE 1 PULSE FOR EACH STRIP
+      Serial.print("Nr of strips:\t");
+    Serial.println(nrOfStrips);
     for (int i = 0; i < nrOfStrips; i++) {
-      makePulse(i, intensity);
+      Serial.println("Going to make a pulse");
+      //makePulse(i, intensity);
     }
   }
 }
@@ -64,7 +74,7 @@ void Hand::deleteRestPulse(int i) {
 //Does a tick for all pulses and deletes finished ones.
 void Hand::doPulse() {
   for (int i = 0; i < Pulses.size(); i++) {
-    //Serial.println("Doing a pulse in dopulse");
+    Serial.println("Doing a pulse tick");
     if (Pulses.get(i)->tickSawWave()) { //tickSawWave
     }
     else {
@@ -93,7 +103,7 @@ void Hand::makePulse(int strip, double intensity) {
   Serial.println(strip);
   Pulse * P = new Pulse(strips[strip]->leds, strips[strip]->nrOfLeds, pulseHue, intensity);
   Pulses.add(P);
-  //Serial.println("Pulse made");
+  Serial.println("Pulse made");
 }
 
 void Hand::deletePulses() {
@@ -113,33 +123,18 @@ void Hand::deletePulse(int i) {
   P = NULL;
 }
 
-
-//Triggers makepulse every pulseTime seconds
-//Used for automatic testing purposes
-void Hand::doTestPulses() {
-  long Time = millis();
-  //int strip = random(0, 1);
-  if ((lastRestPulseTime + 2500 ) < Time)
-  {
-    Serial.println("Making test pulse");
-    for (int i = 0; i < nrOfStrips; i++) {
-      makePulse(i, 1);
-    }
-    lastRestPulseTime = Time;
-  }
-}
-
 void Hand::executeState() {
-  //Serial.print("Executing state: \t");
+  Serial.print("Executing hand-state: \t");
+  Serial.print(currentState);
   switch (currentState) {
     case Rest:
-      //Serial.println("Rest");
+      Serial.println("Rest");
       pulseFade();
       fakeRestPulse(); //For test purposes
       doRestPulse();
       break;
     case Pulsing:
-      //Serial.println("Pulsing");
+      Serial.println("Pulsing");
       if (Pulses.size() == 0) {
         currentState = Rest;
         return;
@@ -151,6 +146,8 @@ void Hand::executeState() {
 }
 
 void Hand::setState(handState state) {
+  Serial.print("Setting the state with: " );
+  Serial.println(state);
   currentState = state;
 }
 
@@ -159,4 +156,10 @@ void Hand::pulseFade() {
   for (int i = 0; i < nrOfStrips; i++) {
     fadeToBlackBy(strips[i]->leds, strips[i]->nrOfLeds, FADER);
   }
+}
+
+void Hand::Test() {
+  Serial.println("This is a test");
+  Serial.print("State:\t");
+  Serial.println(currentState);
 }

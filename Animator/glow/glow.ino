@@ -19,7 +19,7 @@
 #include "Hand.h"
 #include "UART.h"
 #include "I2C.h"
-
+#include "Enums.h"
 
 
 FASTLED_USING_NAMESPACE
@@ -39,27 +39,29 @@ enum globalState {
   Desynchronized
 } GlobalState;
 
-ledstrip Strip1;
-ledstrip Strip2;
-ledstrip Strip3;
-ledstrip Strip4; //Change this when adjusting the nr of ledstrips!
-ledstrip* strips[] = {&Strip1, &Strip2, &Strip3, &Strip4}; //This also!
-ledstrip* hand1Strips[] = {&Strip1, &Strip2};
-ledstrip* hand2Strips[] = {&Strip3, &Strip4};
+
 
 Hand* hand1;
 Hand* hand2;
 Hand* hands[] = {hand1, hand2};
 Hand* activeHand = NULL;
 
+ledstrip Strip1;
+ledstrip Strip2;
+ledstrip Strip3;
+ledstrip Strip4; //Change this when adjusting the nr of ledstrips!
+ledstrip* strips[] = {&Strip1, &Strip2, &Strip3, &Strip4}; //This also!
+
+
+
 void setupHands() {
   //constructor: Hand(ledstrip* Strips[], int NrOfStrips);
-  hand1 = new Hand(hand1Strips, NUM_STRIPS_PER_HAND);
-  hand2 = new Hand(hand2Strips, NUM_STRIPS_PER_HAND);
+  hand1 = new Hand(&Strip1, &Strip2, NUM_STRIPS_PER_HAND);
+  hand2 = new Hand(&Strip3, &Strip4, NUM_STRIPS_PER_HAND);
   Serial.println("Finished setting up hands");
 }
 long lastUpdate = 0;
-
+long lastTestPulseTime = 0;
 
 void executeState() {
   Serial.print("Executing state:\t");
@@ -67,18 +69,18 @@ void executeState() {
     case Normal:
       Serial.println("Normal");
       for (int i = 0; i < NUM_HANDS; i++) {
-        //hands[i]->executeState();
+        hands[i]->executeState();
       }
       FastLED.show();
       break;
     case Synchronized:
       Serial.println("Synchronized");
       for (int i = 0; i < NUM_HANDS; i++) {
-        //hands[i]->deletePulses();
+        hands[i]->deletePulses();
       }
       valveBeat();
       for (int i = 0; i < NUM_HANDS; i++) {
-        //hands[i]->setState(Rest);
+        hands[i]->setState(Rest);
       }
       GlobalState = Normal;
       break;
@@ -171,12 +173,12 @@ void setupLedStrips() {
   Strip2.nrOfLeds = NUM_LEDS_2A + NUM_LEDS_2B;
   Strip3.nrOfLeds = NUM_LEDS_3A + NUM_LEDS_3B;
   Strip4.nrOfLeds = NUM_LEDS_4A + NUM_LEDS_4B;
-
-  Strip1.leds = new CRGB[(Strip1.nrOfLeds)];
-  Strip2.leds = new CRGB[(Strip2.nrOfLeds)];
-  Strip3.leds = new CRGB[(Strip3.nrOfLeds)];
-  Strip4.leds = new CRGB[(Strip4.nrOfLeds)];
-
+  /*
+    Strip1.leds = new CRGB[(Strip1.nrOfLeds)];
+    Strip2.leds = new CRGB[(Strip2.nrOfLeds)];
+    Strip3.leds = new CRGB[(Strip3.nrOfLeds)];
+    Strip4.leds = new CRGB[(Strip4.nrOfLeds)];
+  */
   //wS2811 is GRB
   //wS2811s is BRG
   //Couple 1
@@ -234,24 +236,29 @@ void setup() {
 }
 
 void TestPulses() {
-  for (int i = 0; i < NUM_HANDS; i++) {
-    hands[i]->doTestPulses();
+  long Time = millis();
+  //int strip = random(0, 1);
+  if ((lastTestPulseTime + 2500 ) < Time)
+  {
+    Serial.println("Making test pulse");
+    for (int i = 0; i < 1; i++) {
+      hands[i]->makePulses(1);
+    }
+    lastTestPulseTime = Time;
   }
 }
 
-
 void loop() {
   //Test case 1
-  GlobalState = Synchronized;
+  //GlobalState = Synchronized;
   //Test case 2
-  //TestPulses();
-  //currentState = Normal;
-  
   //readInput();
-  
+
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
-    executeState();
+    hand1->Test();
+    TestPulses();
+    //executeState();
     lastUpdate = millis();
   }
 };
