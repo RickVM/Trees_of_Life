@@ -17,12 +17,12 @@ class Hand {
     LinkedList<Pulse *> RestPulses;
 
     long lastRestPulseTime;
-    void makePulse(int strip, double intensity); //Makes a new pulse for the strip
+    
     void deletePulse(int i);//Deletes a pulse at the given index from the pulses list
     void deleteRestPulse(int i); //Deletes a pulse at the given index from the pulses list
     void makeRestPulse(int strip);
     void pulseFade(); //Fades active strips
-    void doPulse(); //Does a tick for all regular pulses and deletes finished ones.
+    
     void doRestPulse();  //Does a tick for all test pulses and deletes finished ones.
 
   public:
@@ -39,6 +39,10 @@ class Hand {
     //Used for automatic testing purposes
     void makeTestPulses();
     void Test();
+
+    
+    void makePulse(int strip, double intensity); //Makes a new pulse for the strip
+    void doPulse(); //Does a tick for all regular pulses and deletes finished ones.
 
 };
 

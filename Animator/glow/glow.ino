@@ -43,7 +43,7 @@ enum globalState {
 
 Hand* hand1;
 Hand* hand2;
-Hand* hands[] = {hand1, hand2};
+Hand* hands[2];
 Hand* activeHand = NULL;
 
 ledstrip Strip1;
@@ -58,8 +58,11 @@ void setupHands() {
   //constructor: Hand(ledstrip* Strips[], int NrOfStrips);
   hand1 = new Hand(&Strip1, &Strip2, NUM_STRIPS_PER_HAND);
   hand2 = new Hand(&Strip3, &Strip4, NUM_STRIPS_PER_HAND);
+  hands[0] = hand1;
+  hands[1] = hand2;
   Serial.println("Finished setting up hands");
 }
+
 long lastUpdate = 0;
 long lastTestPulseTime = 0;
 
@@ -173,12 +176,12 @@ void setupLedStrips() {
   Strip2.nrOfLeds = NUM_LEDS_2A + NUM_LEDS_2B;
   Strip3.nrOfLeds = NUM_LEDS_3A + NUM_LEDS_3B;
   Strip4.nrOfLeds = NUM_LEDS_4A + NUM_LEDS_4B;
-  /*
-    Strip1.leds = new CRGB[(Strip1.nrOfLeds)];
-    Strip2.leds = new CRGB[(Strip2.nrOfLeds)];
-    Strip3.leds = new CRGB[(Strip3.nrOfLeds)];
-    Strip4.leds = new CRGB[(Strip4.nrOfLeds)];
-  */
+
+  Strip1.leds = new CRGB[(Strip1.nrOfLeds)];
+  Strip2.leds = new CRGB[(Strip2.nrOfLeds)];
+  Strip3.leds = new CRGB[(Strip3.nrOfLeds)];
+  Strip4.leds = new CRGB[(Strip4.nrOfLeds)];
+
   //wS2811 is GRB
   //wS2811s is BRG
   //Couple 1
@@ -241,8 +244,10 @@ void TestPulses() {
   if ((lastTestPulseTime + 2500 ) < Time)
   {
     Serial.println("Making test pulse");
-    for (int i = 0; i < 1; i++) {
-      hands[i]->makePulses(1);
+    for (int i = 0; i < 2; i++) {
+      //hands[i]->testMakePulses(1);
+      hands[i]->makePulse(0, 1);
+      hands[i]->doPulse();
     }
     lastTestPulseTime = Time;
   }
@@ -256,9 +261,9 @@ void loop() {
 
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
-    hand1->Test();
+    //hand1->Test();
     TestPulses();
-    //executeState();
+    executeState();
     lastUpdate = millis();
   }
 };
