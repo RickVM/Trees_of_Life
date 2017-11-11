@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "Communication.h"
 
-#define OldOrNew 1
+#define OldOrNew 2
 
 class UART : public Communication
 {
@@ -19,5 +19,6 @@ class UART : public Communication
     void Begin();
     COMMANDS readCommand(int id);
     int sendCommand( int id, String message);
+    int sendToAll(String message);
 };
 

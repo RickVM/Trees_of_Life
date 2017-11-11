@@ -1,4 +1,8 @@
-/* PINOUT - WIRES
+/* 
+ *  Program for  reading inputs and sending when wich
+ *  controller needs to do what at the exact moment.
+ *    
+ *  PINOUT - WIRES
  * GND        Vin-
  * 0  RX1     AGND-
  * 1  TX1     3,3volt- 
@@ -28,7 +32,7 @@
 //Defines
 #define INPUT_METHOD 2// 1 for buttons, two for 
 #define COMMUNICATION_METHOD 1 // 1 for serial, 2 for i2c
-#define NUM_ANIMATORS 6
+#define NUM_ANIMATORS 3
 #define NUM_INPUTS 6
 #define ID 0
 
@@ -55,7 +59,7 @@ void setup()
       break;
   };
   input->Begin();
-  c = new Controller(input, COMMUNICATION_METHOD, NUM_ANIMATORS, ID);
+  c = new Controller(input, COMMUNICATION_METHOD, NUM_ANIMATORS, ID, NUM_INPUTS);
   c->Begin();
   delay(1000);
   Serial.println("Setup completed");
