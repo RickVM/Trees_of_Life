@@ -26,5 +26,6 @@ class Input
     int getInputValue(int pos);
     int getInputClassification(int pos);
     int getMethode(void);
+    void fix();
 };
 

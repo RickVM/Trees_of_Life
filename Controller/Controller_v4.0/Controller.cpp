@@ -9,6 +9,7 @@
 #define SYNC_DELAY 1000
 #define PULSE_TIME 2500
 #define CYCLES 5
+#define HOTFIX 3
 
 /*
    Controller constructor
@@ -180,6 +181,8 @@ void Controller::syncLogic(void)
     //Execute sync
     this->countLetGo = 0;
     this->syncTime = millis();
+    //HOTFIX set sensors twee high
+    _input->fix();
     //Check if sync is complete
     if (this->syncTime - this->oldSyncTime >= this->syncPreset)
     {
@@ -219,7 +222,7 @@ bool Controller::checkLetGo()
   {
     temp += _input->getInputHigh(i);
   }
-  if (temp < numberInputs)
+  if (temp < HOTFIX)
   {
     delay(150);
     _input->readInputs();//Read the inputs again
@@ -228,7 +231,7 @@ bool Controller::checkLetGo()
     {
       temp += _input->getInputHigh(i);
     }
-    if (temp < this->numberInputs)
+    if (temp < HOTFIX)
     {
       rv = true;
     }
@@ -244,7 +247,7 @@ bool Controller::checkSync()
   {
     temp += _input->getInputHigh(i);
   }
-  if (temp == this->numberInputs)
+  if (temp == HOTFIX)
   {
     delay(25);
     _input->readInputs();
@@ -253,7 +256,7 @@ bool Controller::checkSync()
     {
       temp += _input->getInputHigh(i);
     }
-    if (temp == this->numberInputs)
+    if (temp == HOTFIX)
     {
       rv = true;
     }

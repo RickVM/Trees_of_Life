@@ -1,23 +1,23 @@
-/* 
- *  Program for  reading inputs and sending when wich
- *  controller needs to do what at the exact moment.
- *    
- *  PINOUT - WIRES
- * GND        Vin-
- * 0  RX1     AGND-
- * 1  TX1     3,3volt- 
- * 2-         23 E1
- * 3-         22 T1
- * 4-         21 E2
- * 5-         20 T2
- * 6-         19 E3
- * 7  RX3     18 T3
- * 8  TX3     17 E4
- * 9  RX2     16 T4
- * 10 TX2     15 E5
- * 11 E6      14 T5
- * 12 T6      13 Led
- */         
+/*
+    Program for  reading inputs and sending when wich
+    controller needs to do what at the exact moment.
+
+    PINOUT - WIRES
+   GND        Vin-
+   0  RX1     AGND-
+   1  TX1     3,3volt-
+   2-         23 E1
+   3-         22 T1
+   4-         21 E2
+   5-         20 T2
+   6-         19 E3
+   7  RX3     18 T3
+   8  TX3     17 E4
+   9  RX2     16 T4
+   10 TX2     15 E5
+   11 E6      14 T5
+   12 T6      13 Led
+*/
 
 //Inlcudes
 #include "input.h"
@@ -35,6 +35,8 @@
 #define NUM_ANIMATORS 3
 #define NUM_INPUTS 6
 #define ID 0
+
+#define fakeItUntilYouMakeIt 0//0 means standard program, 1 means we fake the living shit out of this
 
 //Objects
 Input* input;
@@ -67,8 +69,33 @@ void setup()
 
 void loop()
 {
-  input->readInputs();
-  c->Logic();
+  switch (fakeItUntilYouMakeIt) {
+    case 0:
+      input->readInputs();
+      c->Logic();
+      break;
+    case 1:
+      //Fake whatever there can be faked.
+      
+      //Random laten pulsen voor een bepaalde tijd, iets
+      
+      /*
+       * Voor een tijdje 
+       * 
+       * 
+       * 
+       * 
+       */
+      //Lanzaam alle handen bij elkaar, miss gelijk
+      //Flash
+      
+      //Do some fake logic on it.
+      
+      break;
+    default:
+      //Not inplemented yet
+      break;
+  };
   delay(1);
 }
 

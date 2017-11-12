@@ -75,7 +75,20 @@ void Input::setInput(int pos, int x)
 
 boolean Input::getInputHigh(int pos)
 {
-  return highOrLowArray[pos];
+  if (pos == 1 && highOrLowArray[0] == true)
+  {
+    classificationArray[1] = 1;
+    return true;
+  }
+  else if(pos == 2 && highOrLowArray[3] == true)
+  {
+    classificationArray[2] = 1;
+    return true;
+  }
+  else
+  {
+    return highOrLowArray[pos];
+  }
 }
 
 int Input::getInputValue(int pos)
@@ -91,5 +104,17 @@ int Input::getInputClassification(int pos)
 int Input::getMethode(void)
 {
   return this->inputMethode;
+}
+
+void Input::fix()
+{
+  highOrLowArray[1] = true;
+  classificationArray[1] = 1;
+  valueArray[1] = 4;
+
+  highOrLowArray[2] = true;
+  classificationArray[2] = 1;
+  valueArray[2] = 4;
+
 }
 

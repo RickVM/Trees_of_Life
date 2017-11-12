@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include "Input.h"
 
+#define useTemprature 0
+
 class Ultrasoon : public Input 
 {
   private:

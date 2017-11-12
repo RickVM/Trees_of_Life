@@ -34,7 +34,7 @@ void Ultrasoon::PingDistance(void)
   for (int i = 0 ; i < numInputs; i++) {
     digitalWrite(trigPins[i], HIGH);
   }
-  delayMicroseconds(10); // Added this line
+  //delayMicroseconds(10); // Added this line
 
   for (int i = 0 ; i < numInputs; i++) {
     digitalWrite(trigPins[i], LOW);
