@@ -1,5 +1,3 @@
-#include <DistanceGP2Y0A21YK.h>
-
 //Arduino
 
 #define echoPin0 3
@@ -20,7 +18,7 @@
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(9600                                                                                                                         );
 
   pinMode(trigPin0, OUTPUT);
   pinMode(echoPin0, INPUT);

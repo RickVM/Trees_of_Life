@@ -270,8 +270,8 @@ void loop() {
   //Test case 1
   //GlobalState = Synchronized;
   //Test case 2
-  TestPulses();
-  //readInput();
+  //TestPulses();
+  readInput();
 
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
