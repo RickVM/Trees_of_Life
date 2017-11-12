@@ -4,7 +4,12 @@
 #include "Pulse.h"
 #include "Ledstrips.h"
 #include "AnimationSettings.h"
-#include "Enums.h"
+
+enum handState {
+  Rest,
+  Pulsing
+};
+
 
 class Hand {
   private:
@@ -35,7 +40,6 @@ class Hand {
 
     //Triggers makepulse every pulseTime seconds
     //Used for automatic testing purposes
-    void makeTestPulses();
     void Test();
 
 

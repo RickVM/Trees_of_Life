@@ -8,8 +8,8 @@
 #define FPS 40
 
 //Beat Flash vars
-#define  nrOfBeats 4
-#define  nrOfFlashes 1
+#define nrOfBeats 4
+#define nrOfFlashes 1
 #define beatFrames 10 //Number of frames used in the brightness transition
 #define beatDelay 18 //Delay between each frame
 #define beatBrightness 100 // Total brightness the flash reaches.

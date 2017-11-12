@@ -4,6 +4,7 @@ Hand::Hand(ledstrip* Strip1, ledstrip* Strip2, int NrOfStrips)
 {
   strips[0] = Strip1;
   strips[1] = Strip2;
+  nrOfStrips = NrOfStrips;
   Pulses = LinkedList<Pulse*>();
   RestPulses = LinkedList<Pulse*>();
   Serial.println(currentState);
@@ -19,7 +20,7 @@ void Hand::makePulses(double intensity) {
   Serial.println(this->currentState);
   if (this->currentState == Rest) {
     Serial.println("Detecting rest state with a pulse; changing to pulse state");
-    this->currentState = Pulsing;
+    currentState = Pulsing;
     Serial.println("State Changed");
   }
   if (this->currentState == Pulsing) { //Only if in pulse or rest state. When moving this to another file, dont forget to make currentState extern!
@@ -75,11 +76,11 @@ void Hand::deleteRestPulse(int i) {
 void Hand::doPulse() {
   Serial.println("Entered dopulse");
   for (int i = 0; i < Pulses.size(); i++) {
-    Serial.println("Doing a pulse tick");
+      Serial.println("Doing a pulse tick");
     if (Pulses.get(i)->tickSawWave()) { //tickSawWave
     }
     else {
-     deletePulse(i);
+      deletePulse(i);
     }
   }
 }

@@ -13,13 +13,11 @@
   wS2811s is BRG
 */
 
-
 #include "FastLED.h"
 #include "ledstrips.h"
 #include "Hand.h"
 #include "UART.h"
 #include "I2C.h"
-#include "Enums.h"
 
 
 FASTLED_USING_NAMESPACE
@@ -52,7 +50,7 @@ ledstrip Strip3;
 ledstrip Strip4; //Change this when adjusting the nr of ledstrips!
 ledstrip* strips[] = {&Strip1, &Strip2, &Strip3, &Strip4}; //This also!
 
-
+long randomPulseTime = 2500;
 
 void setupHands() {
   //constructor: Hand(ledstrip* Strips[], int NrOfStrips);
@@ -109,7 +107,7 @@ void executeState() {
 void readInput() {
   COMMANDS x = COM->readCommand(ID);
   //Get hand, return int for wich hand
-  int y = COM->getHand();//Could be 1 or 2
+  int y = COM->getHand();//Could be 1 or 2 or 0
   if (y == 0) { //0 stands for all hands
     switch (x) {
       case error:
@@ -185,6 +183,8 @@ void setupLedStrips() {
   //wS2811 is GRB
   //wS2811s is BRG
   //Couple 1
+
+  //Hand1
   FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[0]->leds, 0, NUM_LEDS_1A).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<WS2811, DATA2_PIN, GRB>(strips[0]->leds, NUM_LEDS_1A, NUM_LEDS_1B).setCorrection(TypicalLEDStrip);
 
@@ -192,7 +192,9 @@ void setupLedStrips() {
   FastLED.addLeds<WS2811, DATA3_PIN, GRB>(strips[1]->leds, 0,  NUM_LEDS_2A).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<WS2811, DATA4_PIN, GRB>(strips[1]->leds, NUM_LEDS_2A, NUM_LEDS_2B).setCorrection(TypicalLEDStrip);
 
-  //Couple 3
+
+  //Hand 2  
+  //Couple 3 
   FastLED.addLeds<WS2811, DATA5_PIN, GRB>(strips[2]->leds, 0,  NUM_LEDS_3A).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<WS2811, DATA6_PIN, GRB>(strips[2]->leds, NUM_LEDS_3A, NUM_LEDS_3B).setCorrection(TypicalLEDStrip);
 
@@ -240,29 +242,40 @@ void setup() {
 
 void TestPulses() {
   long Time = millis();
-  //int strip = random(0, 1);
-  if ((lastTestPulseTime + 2500 ) < Time)
+
+  if ((lastTestPulseTime + randomPulseTime ) < Time)
   {
+    //int strip = random(0, 1);
     Serial.println("Making test pulse");
     for (int i = 0; i < NUM_HANDS; i++) {
-      hands[i]->testMakePulses(i);
-      //hands[i]->makePulse(0, 1);
-      //hands[i]->doPulse();
+      hands[i]->makePulses(1);
     }
+    randomPulseTime = random(1500, 4500);
     lastTestPulseTime = Time;
   }
 }
 
+void testLength() {
+  for (int i = 100; i >= 3; i--) {
+    for (int j = 0; j < NUM_STRIPS_TOTAL; j++)
+      strips[j]->leds[i] = CHSV(225, 225, 225);
+  }
+  FastLED.show();
+  Serial.println("test complete");
+}
+
+
 void loop() {
+
   //Test case 1
   //GlobalState = Synchronized;
   //Test case 2
   TestPulses();
-    //readInput();
+  //readInput();
 
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
-
+    //testLength();
     executeState();
     lastUpdate = millis();
   }

@@ -12,8 +12,8 @@ COMMANDS Communication::checkProtocol(String message)
 {
   COMMANDS rv = error;
   //Strip message of number
-  char h = message.charAt(0);
-  this->hand = (int)h;
+  String h = message.substring(0, 1);
+  this->hand = h.toInt();
   //Save number as hand var
   String tempMessage = message.substring(1);
   if (tempMessage == "pulse5")

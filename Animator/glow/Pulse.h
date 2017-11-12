@@ -22,7 +22,6 @@ class Pulse {
     //Heartbeat pulse vars.
     //Used for old pulse 'tick' (line)
     const int hPulseSize = 5; //This number cannot be lower than pulseSpeed, otherwise the pulse will skip leds!
-
     //Used for new pulse (wavelike)
     //These should be made const after prototyping
     int pulseSpeed;
@@ -41,7 +40,7 @@ class Pulse {
 
     //used in both rest and non rest pulse
     int pulseIndex;
-
+    void cHue();
     //used for rest pulse
     const int restpulseSize = 5;
     int restpulseLifeTime = 2000;
