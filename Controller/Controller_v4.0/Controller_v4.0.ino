@@ -46,6 +46,8 @@ Controller* c;
 uint8_t inputsArray[6] = {23, 21, 19, 17, 15, 12};//Change the numbers, but DO NOT DELETE THIS ARRAY, echo, Rood kabel en blauw tape, of groen
 uint8_t triggerArray[6] = {22, 20, 18, 16, 14, 11};//zwart kabel en wit tape, of groen
 
+long _time;
+
 void setup()
 {
   Serial.begin(9600);//Just for debugging.
@@ -65,37 +67,25 @@ void setup()
   c->Begin();
   delay(1000);
   Serial.println("Setup completed");
+  _time = millis();
 }
 
 void loop()
 {
+  _time = millis();
   switch (fakeItUntilYouMakeIt) {
     case 0:
       input->readInputs();
       c->Logic();
       break;
     case 1:
-      //Fake whatever there can be faked.
-      
-      //Random laten pulsen voor een bepaalde tijd, iets
-      
-      /*
-       * Voor een tijdje 
-       * 
-       * 
-       * 
-       * 
-       */
-      //Lanzaam alle handen bij elkaar, miss gelijk
-      //Flash
-      
-      //Do some fake logic on it.
-      
+      input->fakeInputs(_time);
+      c->Logic();
       break;
     default:
       //Not inplemented yet
       break;
   };
-  delay(1);
+  delay(2);
 }
 

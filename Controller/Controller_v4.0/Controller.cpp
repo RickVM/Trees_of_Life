@@ -8,8 +8,8 @@
 
 #define SYNC_DELAY 1000
 #define PULSE_TIME 2500
-#define CYCLES 5
-#define HOTFIX 3
+#define CYCLES 2
+#define NUMBER_OF_HANDS_TO_SYNC 3
 
 /*
    Controller constructor
@@ -181,8 +181,8 @@ void Controller::syncLogic(void)
     //Execute sync
     this->countLetGo = 0;
     this->syncTime = millis();
-    //HOTFIX set sensors twee high
-    _input->fix();
+    //NUMBER_OF_HANDS_TO_SYNC set sensors twee high
+    //_input->fix();
     //Check if sync is complete
     if (this->syncTime - this->oldSyncTime >= this->syncPreset)
     {
@@ -222,7 +222,7 @@ bool Controller::checkLetGo()
   {
     temp += _input->getInputHigh(i);
   }
-  if (temp < HOTFIX)
+  if (temp < NUMBER_OF_HANDS_TO_SYNC)
   {
     delay(150);
     _input->readInputs();//Read the inputs again
@@ -231,7 +231,7 @@ bool Controller::checkLetGo()
     {
       temp += _input->getInputHigh(i);
     }
-    if (temp < HOTFIX)
+    if (temp < NUMBER_OF_HANDS_TO_SYNC)
     {
       rv = true;
     }
@@ -247,7 +247,7 @@ bool Controller::checkSync()
   {
     temp += _input->getInputHigh(i);
   }
-  if (temp == HOTFIX)
+  if (temp >= NUMBER_OF_HANDS_TO_SYNC)
   {
     delay(25);
     _input->readInputs();
@@ -256,7 +256,7 @@ bool Controller::checkSync()
     {
       temp += _input->getInputHigh(i);
     }
-    if (temp == HOTFIX)
+    if (temp >= NUMBER_OF_HANDS_TO_SYNC)
     {
       rv = true;
     }
@@ -362,6 +362,7 @@ void Controller::LetGo(void)
 void Controller::Flash(void)
 {
   //Send to all three teensy's, via special function.
+  Serial.println("Sending flash ");
   COM->sendToAll("flash");
   /*
     for (int i = 1; i <= this->numberAnimators; i++)

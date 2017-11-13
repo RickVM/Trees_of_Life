@@ -3,7 +3,13 @@
 #include <Arduino.h>
 
 class Input
-{
+{ 
+  private:
+    long _oldTime;
+    long firstTimeStarted;
+    boolean settedAllInputsHigh = false;
+    
+  
   public:
     int numInputs;
     int requiredDistance;
@@ -26,6 +32,7 @@ class Input
     int getInputValue(int pos);
     int getInputClassification(int pos);
     int getMethode(void);
-    void fix();
+    void fix(void);
+    void fakeInputs(long _time);
 };
 
