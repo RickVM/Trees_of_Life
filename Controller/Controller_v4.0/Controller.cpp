@@ -9,7 +9,7 @@
 #define SYNC_DELAY 1000
 #define PULSE_TIME 2500
 #define CYCLES 2
-#define NUMBER_OF_HANDS_TO_SYNC 3
+#define NUMBER_OF_HANDS_TO_SYNC 4
 
 /*
    Controller constructor
@@ -98,7 +98,7 @@ void Controller::Logic(void)
 void Controller::syncingFailedLogic(void)
 {
   this->LetGo();
-  delay(10000);
+  delay(20000);
   syncingFailed = false;
   this->Reset();
 }

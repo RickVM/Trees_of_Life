@@ -30,7 +30,7 @@
 #include <Arduino.h>
 
 //Defines
-#define INPUT_METHOD 2// 1 for buttons, two for 
+#define INPUT_METHOD 2// 1 for buttons, two for ultrasonic sensors
 #define COMMUNICATION_METHOD 1 // 1 for serial, 2 for i2c
 #define NUM_ANIMATORS 3
 #define NUM_INPUTS 6
@@ -86,6 +86,6 @@ void loop()
       //Not inplemented yet
       break;
   };
-  delay(2);
+  delay(1);
 }
 

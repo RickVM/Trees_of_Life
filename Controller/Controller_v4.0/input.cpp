@@ -80,6 +80,7 @@ void Input::setInput(int pos, int x)
 
 boolean Input::getInputHigh(int pos)
 {
+  /*
   if (pos == 1 && highOrLowArray[0] == true)
   {
     classificationArray[1] = 1;
@@ -91,9 +92,9 @@ boolean Input::getInputHigh(int pos)
     return true;
   }
   else
-  {
+  {*/
     return highOrLowArray[pos];
-  }
+  //}
 }
 
 int Input::getInputValue(int pos)
@@ -111,8 +112,10 @@ int Input::getMethode(void)
   return this->inputMethode;
 }
 
+
 void Input::fix()
 {
+  Serial.println("Ik kom nog hier");
   highOrLowArray[1] = true;
   classificationArray[1] = 1;
   valueArray[1] = 4;
