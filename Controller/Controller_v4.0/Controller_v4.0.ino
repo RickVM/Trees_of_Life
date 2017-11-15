@@ -43,6 +43,7 @@ Input* input;
 Controller* c;
 
 //Input arrays
+//                        1   2   3   4   5   6
 uint8_t inputsArray[6] = {23, 21, 19, 17, 15, 12};//Change the numbers, but DO NOT DELETE THIS ARRAY, echo, Rood kabel en blauw tape, of groen
 uint8_t triggerArray[6] = {22, 20, 18, 16, 14, 11};//zwart kabel en wit tape, of groen
 

@@ -80,21 +80,22 @@ void Input::setInput(int pos, int x)
 
 boolean Input::getInputHigh(int pos)
 {
-  /*
+  //Link 2 on 1
   if (pos == 1 && highOrLowArray[0] == true)
   {
     classificationArray[1] = 1;
     return true;
   }
-  else if (pos == 2 && highOrLowArray[3] == true)
+  //Link 6 on 5
+  else if (pos == 5 && highOrLowArray[4] == true)
   {
     classificationArray[2] = 1;
     return true;
   }
   else
-  {*/
+  {
     return highOrLowArray[pos];
-  //}
+  }
 }
 
 int Input::getInputValue(int pos)

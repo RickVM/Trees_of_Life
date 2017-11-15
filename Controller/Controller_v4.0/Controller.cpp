@@ -8,8 +8,8 @@
 
 #define SYNC_DELAY 1000
 #define PULSE_TIME 2500
-#define CYCLES 2
-#define NUMBER_OF_HANDS_TO_SYNC 4
+#define CYCLES 0
+#define NUMBER_OF_HANDS_TO_SYNC 3
 
 /*
    Controller constructor
@@ -23,7 +23,7 @@ Controller::Controller(Input* input, int comMethod, int numAnimators, int id, in
   this->_input = input;
   this->communicationMethod = comMethod;
   this->numberAnimators = numAnimators;
-  this->syncPreset = 15000;
+  this->syncPreset = 10000;//Hoelang tot een nieuwe flash
   this->id = id;
   this->numberInputs = numInputs;
 }
@@ -98,9 +98,11 @@ void Controller::Logic(void)
 void Controller::syncingFailedLogic(void)
 {
   this->LetGo();
-  delay(20000);
   syncingFailed = false;
   this->Reset();
+  Serial.println("Start desyn");
+  delay(1000);
+  Serial.println("Stopping desync");
 }
 
 /*
@@ -209,7 +211,7 @@ void Controller::calculateAdjustments(void)
   for (int k = 0; k < this->numberInputs; k++)
   {
     adjustmentTimes[k] = average - oldTime[k];
-    adjustmentSteps[k] = adjustmentTimes[k] / 10;
+    adjustmentSteps[k] = adjustmentTimes[k] / 3;
     pulseTime[k] += adjustmentSteps[k];
   }
 }
