@@ -2,7 +2,7 @@
 
 #include <LinkedList.h>
 #include "Pulse.h"
-#include "Ledstrips.h"
+#include "PinoutSettings.h"
 #include "AnimationSettings.h"
 
 enum handState {

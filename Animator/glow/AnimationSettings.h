@@ -1,11 +1,30 @@
 #pragma once
 
+#include "PinoutSettings.h"
+#if TREE == 1
+#define pulseHue 40
+#define restPulseHue 90
+#define flashR 255
+#define flashG 70
+#define flashB 0
+#endif
+
+#if TREE == 2
+#define pulseHue 225
+#define restPulseHue 90
+#define flashR 255
+#define flashG 0
+#define flashB 30
+
+#endif
+
+
 #define BRIGHTNESS  125 //200
 #define FRAMES_PER_SECOND  40
 #define FADER 40
 #define PULSEFADER 40
 #define FALL_FADER 30
-#define FPS 40
+#define FPS 30
 
 //Beat Flash vars
 #define nrOfBeats 4
@@ -14,18 +33,16 @@
 #define beatDelay 18 //Delay between each frame
 #define beatBrightness 100 // Total brightness the flash reaches.
 #define flashSpeed 10
-#define flashR 255
-#define flashG 0
-#define flashB 0
+#define fakeFlashTime 310000
+
 #define smallValveDelay 10
 #define bigValveDelay 450
 
 
-#define desyncTime 8000
+#define desyncTime 10000
 //Rest pulse vars
 //Pulse vars
-#define pulseHue 225
-#define restPulseHue 90
+
 #define RestPulseTime 2500
 
 #define pulse5Intensity 1

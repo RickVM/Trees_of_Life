@@ -14,10 +14,11 @@
 */
 
 #include "FastLED.h"
-#include "ledstrips.h"
 #include "Hand.h"
 #include "UART.h"
 #include "I2C.h"
+#include "AnimationSettings.h"
+#include "PinoutSettings.h"
 
 
 FASTLED_USING_NAMESPACE
@@ -63,6 +64,8 @@ void setupHands() {
 
 long lastUpdate = 0;
 long lastTestPulseTime = 0;
+long lastFlash = 0;
+
 
 void executeState() {
   Serial.print("Executing state:\t");
@@ -91,7 +94,7 @@ void executeState() {
       unsigned long startTime = millis();
       while ((desyncTime + startTime)  > millis()) {
         for (int i = 0; i < NUM_STRIPS_TOTAL; i++) {
-          fadeToBlackBy(strips[i]->leds, NUM_LEDS, FALL_FADER);
+          fadeToBlackBy(strips[i]->leds, strips[i]->nrOfLeds, FALL_FADER);
         }
         for (int i = 0; i < NUM_HANDS; i++) {
           hands[i]->collapsePulse(); //Gets all existing pulses from a list and collapses them.
@@ -185,23 +188,30 @@ void setupLedStrips() {
   //Couple 1
 
   //Hand1
-  FastLED.addLeds<WS2811, DATA1_PIN, GRB>(strips[0]->leds, 0, NUM_LEDS_1A).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA2_PIN, GRB>(strips[0]->leds, NUM_LEDS_1A, NUM_LEDS_1B).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA1_PIN, HAND11ATYPE>(strips[0]->leds, 0, NUM_LEDS_1A).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA2_PIN, HAND11BTYPE>(strips[0]->leds, NUM_LEDS_1A, NUM_LEDS_1B).setCorrection(TypicalLEDStrip);
 
   //Couple 2
-  FastLED.addLeds<WS2811, DATA3_PIN, GRB>(strips[1]->leds, 0,  NUM_LEDS_2A).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA4_PIN, GRB>(strips[1]->leds, NUM_LEDS_2A, NUM_LEDS_2B).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA3_PIN, HAND12ATYPE>(strips[1]->leds, 0,  NUM_LEDS_2A).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA4_PIN, HAND12BTYPE>(strips[1]->leds, NUM_LEDS_2A, NUM_LEDS_2B).setCorrection(TypicalLEDStrip);
 
 
-  //Hand 2  
-  //Couple 3 
-  FastLED.addLeds<WS2811, DATA5_PIN, GRB>(strips[2]->leds, 0,  NUM_LEDS_3A).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA6_PIN, GRB>(strips[2]->leds, NUM_LEDS_3A, NUM_LEDS_3B).setCorrection(TypicalLEDStrip);
+  //Hand 2
+  //Couple 3
+  FastLED.addLeds<WS2811, DATA5_PIN, HAND21ATYPE>(strips[2]->leds, 0,  NUM_LEDS_3A).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, DATA6_PIN, HAND21BTYPE>(strips[2]->leds, NUM_LEDS_3A, NUM_LEDS_3B).setCorrection(TypicalLEDStrip);
 
   //Couple 4
-  FastLED.addLeds<WS2811, DATA7_PIN, GRB>(strips[3]->leds, 0, NUM_LEDS_4A).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, DATA8_PIN, GRB>(strips[3]->leds, NUM_LEDS_4A, NUM_LEDS_4B).setCorrection(TypicalLEDStrip);
-
+  if (TREE == 1) {
+    if (CONTROLLER == 3) {
+      FastLED.addLeds<WS2811, DATA8_PIN, HAND22ATYPE>(strips[3]->leds, 0, NUM_LEDS_4A).setCorrection(TypicalLEDStrip);
+      FastLED.addLeds<WS2811, DATA7_PIN, HAND22BTYPE>(strips[3]->leds, NUM_LEDS_4A, NUM_LEDS_4B).setCorrection(TypicalLEDStrip);
+    }
+  }
+  else {
+    FastLED.addLeds<WS2811, DATA7_PIN, HAND22ATYPE>(strips[3]->leds, 0, NUM_LEDS_4A).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<WS2811, DATA8_PIN, HAND22BTYPE>(strips[3]->leds, NUM_LEDS_4A, NUM_LEDS_4B).setCorrection(TypicalLEDStrip);
+  }
   Serial.println("Fininshed setting up led strips");
 }
 
@@ -263,20 +273,31 @@ void testLength() {
   FastLED.show();
   Serial.println("test complete");
 }
-
+void checkFakeFlash() {
+  long Time = millis();
+  if (Time > lastFlash + fakeFlashTime) {
+    GlobalState = Synchronized;
+    lastFlash = Time;
+  }
+}
 
 void loop() {
+  if (testMode)
+  {
+    //checkFakeFlash();
+    TestPulses();
+  }
+  else {
+    readInput();
+  }
 
-  //Test case 1
-  //GlobalState = Synchronized;
-  //Test case 2
-  //TestPulses();
-  readInput();
-
+  //Update state according to FPS.
   long currentTime = millis();
   if (currentTime >= (lastUpdate + (1000 / FPS))) {
-    //testLength();
     executeState();
     lastUpdate = millis();
+    Serial.print("State execution time in millis:\t");
+    Serial.println((lastUpdate - currentTime));
+
   }
 };
