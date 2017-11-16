@@ -36,7 +36,7 @@
 #define NUM_INPUTS 6
 #define ID 0
 
-#define fakeItUntilYouMakeIt 0//0 means standard program, 1 means we fake the living shit out of this
+#define fakeItUntilYouMakeIt 0//0 means standard program, 1 means we fake the living shit out of this, 2 run the program using sound
 
 //Objects
 Input* input;
@@ -82,6 +82,10 @@ void loop()
     case 1:
       input->fakeInputs(_time);
       c->Logic();
+      break;
+    case 2:
+      //Add here code for making the tree move on sound
+      
       break;
     default:
       //Not inplemented yet
