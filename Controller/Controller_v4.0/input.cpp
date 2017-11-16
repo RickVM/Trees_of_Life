@@ -80,6 +80,7 @@ void Input::setInput(int pos, int x)
 
 boolean Input::getInputHigh(int pos)
 {
+  /*
   //Link 2 on 1
   if (pos == 1 && highOrLowArray[0] == true)
   {
@@ -93,9 +94,9 @@ boolean Input::getInputHigh(int pos)
     return true;
   }
   else
-  {
+  {*/
     return highOrLowArray[pos];
-  }
+  //}
 }
 
 int Input::getInputValue(int pos)
