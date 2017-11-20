@@ -204,6 +204,7 @@ void setupLedStrips() {
   //Couple 4
   if (TREE == 1) {
     if (CONTROLLER == 3) {
+      //Controller 3 has physically switched data pins.
       FastLED.addLeds<WS2811, DATA8_PIN, HAND22ATYPE>(strips[3]->leds, 0, NUM_LEDS_4A).setCorrection(TypicalLEDStrip);
       FastLED.addLeds<WS2811, DATA7_PIN, HAND22BTYPE>(strips[3]->leds, NUM_LEDS_4A, NUM_LEDS_4B).setCorrection(TypicalLEDStrip);
     }
