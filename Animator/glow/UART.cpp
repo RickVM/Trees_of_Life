@@ -8,9 +8,10 @@ UART::UART(int baudrate) : Communication()
 void UART::Begin()
 {
   Serial1.begin(this->_baudRate);
-  Serial2.begin(this->_baudRate);
-  Serial3.begin(this->_baudRate);
+  //Serial2.begin(this->_baudRate);
+  //Serial3.begin(this->_baudRate);
 }
+
 
 //Not needed for first prototype
 COMMANDS UART::readCommand(int id)
@@ -46,10 +47,10 @@ int UART::sendCommand(int id, String message)
       Serial1.println(_format(message));
       break;
     case 2:
-      Serial2.println(_format(message));
+      //Serial2.println(_format(message));
       break;
     case 3:
-      Serial3.println(_format(message));
+      //Serial3.println(_format(message));
       break;
     default:
       rv = -1;
@@ -58,3 +59,4 @@ int UART::sendCommand(int id, String message)
   }
   return rv;
 }
+

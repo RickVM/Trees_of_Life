@@ -15,13 +15,6 @@ extern bool stripTypeNew;
 #define NEW_SECONDWAVEAMPLITUDEFACTOR 2.6
 #define NEW_RESTPULSESPEED 1
 
-//used with the old strips
-#define OLD_PULSESPEED 3
-#define OLD_FALLSPEED 3
-#define OLD_FIRSTWAVEAMPLITUDEFACTOR 2
-#define OLD_SECONDWAVEAMPLITUDEFACTOR 1.3
-#define OLD_RESTPULSESPEED 1
-
 class Pulse {
   private:
     int num_leds;
@@ -29,7 +22,6 @@ class Pulse {
     //Heartbeat pulse vars.
     //Used for old pulse 'tick' (line)
     const int hPulseSize = 5; //This number cannot be lower than pulseSpeed, otherwise the pulse will skip leds!
-
     //Used for new pulse (wavelike)
     //These should be made const after prototyping
     int pulseSpeed;
@@ -40,7 +32,7 @@ class Pulse {
     const int secondWave =  40;
     const int waveTail = 20; //2/3 head, 1/3 tail
     //Used for custom wave
-    const int waveSize = 30;
+    const int waveSize = 10;
     const int brightness = 150;
     CRGB* leds;
 
@@ -48,7 +40,7 @@ class Pulse {
 
     //used in both rest and non rest pulse
     int pulseIndex;
-
+    void cHue();
     //used for rest pulse
     const int restpulseSize = 5;
     int restpulseLifeTime = 2000;

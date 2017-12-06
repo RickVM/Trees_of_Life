@@ -5,23 +5,16 @@ Pulse::Pulse(CRGB * StripLeds, int Num_leds, int Hue, double intensity) {
   this->leds = StripLeds;
   this->num_leds = Num_leds;
   this->hue = Hue;
+  //cPulseHue = random(2, 230);
   pulseIndex = 0 - (firstWave + secondWave); // in case of tickSawWave
   pulseDec = pulseIndex;
 
   //Temp so we can prototype with the old strips.
   //If id equals a new strip then use new strip settings
-  if (stripTypeNew) {
-    pulseSpeed = NEW_PULSESPEED;
-    fallSpeed = NEW_FALLSPEED;
-    firstWaveAmplitudeFactor = (NEW_FIRSTWAVEAMPLITUDEFACTOR * intensity);
-    secondWaveAmplitudeFactor = (NEW_SECONDWAVEAMPLITUDEFACTOR * intensity);
-  }
-  else {
-    pulseSpeed = OLD_PULSESPEED;
-    fallSpeed = OLD_FALLSPEED;
-    firstWaveAmplitudeFactor = (OLD_FIRSTWAVEAMPLITUDEFACTOR * intensity);
-    secondWaveAmplitudeFactor = (OLD_SECONDWAVEAMPLITUDEFACTOR * intensity);
-  }
+  pulseSpeed = NEW_PULSESPEED;
+  fallSpeed = NEW_FALLSPEED;
+  firstWaveAmplitudeFactor = (NEW_FIRSTWAVEAMPLITUDEFACTOR * intensity);
+  secondWaveAmplitudeFactor = (NEW_SECONDWAVEAMPLITUDEFACTOR * intensity);
 }
 
 //used for rest pulse
@@ -31,12 +24,7 @@ Pulse::Pulse(CRGB* StripLeds, int Num_leds, int Hue, int customIndex) {
   this->hue = Hue;
   pulseIndex = customIndex;
   pulseDec = pulseIndex;
-  if (stripTypeNew) {
-    restPulseSpeed = NEW_RESTPULSESPEED;
-  }
-  else {
-    restPulseSpeed = OLD_RESTPULSESPEED;
-  }
+  restPulseSpeed = NEW_RESTPULSESPEED;
   startTime = millis();
 }
 
@@ -67,7 +55,7 @@ void Pulse::SawToothWave(int x, int waveSize, int tailWave) {
   }
   //Serial.println("Secondwave");
   for (int i = tailWave, e = firstWaveSize; i >= 0; i--, currentPixel++, e -= 2) {
-    if ((currentPixel + x) >= 0 && (currentPixel + x ) < num_leds) {
+      if ((currentPixel + x) >= 0 && (currentPixel + x ) < num_leds) {
       int waveParticle = (int)(triwave8(e) * secondWaveAmplitudeFactor + 20);
       if (waveParticle > 0) {
         leds[x + currentPixel] = CHSV(hue, 255, waveParticle);
@@ -76,9 +64,16 @@ void Pulse::SawToothWave(int x, int waveSize, int tailWave) {
   }
 }
 
+void Pulse::cHue() {
+  if (hue >= 240) {
+    hue = 5;
+  }
+  hue += 1;
+}
+
 bool Pulse::tickCustomWave() {
-  if (pulseIndex + (waveSize * 2) >= num_leds) {
-    //Do nothing
+  if (pulseIndex >= num_leds) {
+    return false;
   }
   else {
     int e = 0;
@@ -87,22 +82,32 @@ bool Pulse::tickCustomWave() {
       Serial.print("LED:");
       Serial.print(pulseIndex + i);
       Serial.print("\t");
-      Serial.println(bigWaveBrightness[i]);
-      leds[pulseIndex + i] = CHSV(hue, 255, bigWaveBrightness[i]);
+      //Serial.println(bigWaveBrightness[i]);
+      if (pulseIndex + i < num_leds) {
+        if (pulseIndex + i >= 0)
+          leds[pulseIndex + i] = CHSV(hue, 255, 100);
+        //leds[pulseIndex + i] = CHSV(hue, 255, bigWaveBrightness[i]);
+      }
     }
     Serial.println("Smallwave");
     for (int i = 0; i < waveSize; i++, e++) {
       Serial.print("LED:");
       Serial.print(pulseIndex + e);
       Serial.print("\t");
-      Serial.println(bigWaveBrightness[i]);
-      leds[pulseIndex + e] = CHSV(hue, 255, smallWaveBrightness[i]);
+      //Serial.println(bigWaveBrightness[i]);
+      if (pulseIndex + e >= 0)
+        if (pulseIndex + e < num_leds) {
+          leds[pulseIndex + e] = CHSV(hue, 255, 100);
+
+          // leds[pulseIndex + e] = CHSV(hue, 255, smallWaveBrightness[i]);
+        }
     }
     pulseDec += pulseSpeed;
     pulseIndex = (int)pulseDec; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
   }
   return true;
 }
+
 bool Pulse::tickSawWave() {
   if (pulseIndex >= num_leds) {
     return false;
@@ -113,6 +118,7 @@ bool Pulse::tickSawWave() {
     //Serial.printf("Before addition: PulseDec : %f, pulseSpeed: %d pulseIndex: %d\n", pulseDec, pulseSpeed, pulseIndex);
     pulseDec += pulseSpeed;
     pulseIndex = (int)pulseDec; //THIS ENHANCES CUSTOMIZABILITY BUT MIGHT AFFECT SPEED. VERIFY LATER!
+    //cHue();
     //Serial.printf("Before addition: PulseDec : %f, pulseSpeed: %d pulseIndex: %d\n", pulseDec, pulseSpeed, pulseIndex);
   }
   return true;
