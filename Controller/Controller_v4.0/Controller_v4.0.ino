@@ -36,8 +36,6 @@
 #define NUM_INPUTS 6
 #define ID 0
 
-#define fakeItUntilYouMakeIt 0//0 means standard program, 1 means we fake the living shit out of this, 2 run the program using sound
-
 //Objects
 Input* input;
 Controller* c;
@@ -46,8 +44,6 @@ Controller* c;
 //                        1   2   3   4   5   6
 uint8_t inputsArray[6] = {23, 21, 19, 17, 15, 12};//Change the numbers, but DO NOT DELETE THIS ARRAY, echo, Rood kabel en blauw tape, of groen
 uint8_t triggerArray[6] = {22, 20, 18, 16, 14, 11};//zwart kabel en wit tape, of groen
-
-long _time;
 
 void setup()
 {
@@ -68,29 +64,12 @@ void setup()
   c->Begin();
   delay(1000);
   Serial.println("Setup completed");
-  _time = millis();
 }
 
 void loop()
 {
-  _time = millis();
-  switch (fakeItUntilYouMakeIt) {
-    case 0:
-      input->readInputs();
-      c->Logic();
-      break;
-    case 1:
-      input->fakeInputs(_time);
-      c->Logic();
-      break;
-    case 2:
-      //Add here code for making the tree move on sound
-      
-      break;
-    default:
-      //Not inplemented yet
-      break;
-  };
+  input->readInputs();
+  c->Logic();
   delay(1);
 }
 

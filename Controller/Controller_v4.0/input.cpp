@@ -27,11 +27,6 @@ void Input::setRequiredDistance(int x, int y)
 {
   requiredDistance = x;
   minimalDistance = y;
-  //Fix for shit
-  randomSeed(analogRead(A12));
-  _oldTime = 0;
-  firstTimeStarted = 0;
-  settedAllInputsHigh = false;
 }
 
 /*
@@ -80,23 +75,7 @@ void Input::setInput(int pos, int x)
 
 boolean Input::getInputHigh(int pos)
 {
-  /*
-  //Link 2 on 1
-  if (pos == 1 && highOrLowArray[0] == true)
-  {
-    classificationArray[1] = 1;
-    return true;
-  }
-  //Link 6 on 5
-  else if (pos == 5 && highOrLowArray[4] == true)
-  {
-    classificationArray[2] = 1;
-    return true;
-  }
-  else
-  {*/
-    return highOrLowArray[pos];
-  //}
+  return highOrLowArray[pos];
 }
 
 int Input::getInputValue(int pos)
@@ -113,70 +92,4 @@ int Input::getMethode(void)
 {
   return this->inputMethode;
 }
-
-
-void Input::fix()
-{
-  Serial.println("Ik kom nog hier");
-  highOrLowArray[1] = true;
-  classificationArray[1] = 1;
-  valueArray[1] = 4;
-
-  highOrLowArray[2] = true;
-  classificationArray[2] = 1;
-  valueArray[2] = 4;
-
-}
-/*
-         Voor een tijdje een pulse laten doen
-         Dan gewoon elke twee en een halve seconden hand laten pulsen
-         Dan alle zes gelijk laten lopen voor een bepaalde tijd
-         Daarna de flash doen, en hem weer in rust laten komen.
-*/
-
-/*
-   setTimeArray used for setting time for when different shit needs to happen
-
-*/
-void Input::fakeInputs(long _time)
-{
-  //Check if all inputs are high, then keep them high until after the flash
-  if (settedAllInputsHigh == true)
-  {
-    //Serial.println("Stuck in time");
-    if (_time - firstTimeStarted >= 90000)
-    {
-      //reset the shit
-      settedAllInputsHigh = false;
-      _oldTime = _time;
-      firstTimeStarted = _time;
-    }
-  }
-  else if (_time - firstTimeStarted >= 60000 && settedAllInputsHigh == false)
-  {
-    Serial.println("stuck in other shit");
-    //Set all inputs high
-    for (int i = 0; i < 6; i++)
-    {
-      highOrLowArray[i] = true;
-      classificationArray[i] = 1;
-      valueArray[i] = 4;
-    }
-    settedAllInputsHigh = true;
-  }
-  else if (_time - _oldTime >= 4500)
-  {
-    int x = random(6);
-    int y = random(1, 15);
-    //Generate random value between 0 and 6 for wich hand goes on
-    //Generate random value between 1 and 14 for pulse
-    this->setInput(x, y);
-    Serial.print("Setting hand = ");
-    Serial.print(x);
-    Serial.print(" with value ");
-    Serial.println(y);
-    _oldTime = _time;
-  }
-}
-
 
