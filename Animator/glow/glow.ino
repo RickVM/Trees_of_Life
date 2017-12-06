@@ -1,16 +1,5 @@
-/*V2.1 Demo version. This program controls 2 LED-Strips based upon given commands through serial.
-   LED strip is assumed to have 420 LEDS spread over 7 meters. (60/M)
-   Author: Rick van Melis & Simon Lit
-   For jack connectors of octoboard see: https://www.pjrc.com/store/octo28_adaptor.html
-
-  Fastled library is used to control the leds. (google it)
-  The following linked list library is used to keep a list of pulses https://github.com/ivanseidel/LinkedList
-
-  Testing strips that are used are: ws2812 RGB strips.
-  The final strips that are used are: ws2811 GRB strips. (current prototype strip is 40 leds big);
-  2 types of final strips:
-  wS2811 which is GRB
-  wS2811s is BRG
+/*
+      Author: Rick van Melis & Simon Lit
 */
 
 #include "FastLED.h"
