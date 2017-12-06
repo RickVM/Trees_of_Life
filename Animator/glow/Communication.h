@@ -2,30 +2,25 @@
 
 #include <Arduino.h>
 
-enum COMMANDS{
+enum COMMANDS {
   error,
-  pulse,
+  pulse1,
+  pulse2,
+  pulse3,
   flash,
-  backward
-  };
+  backward,
+  rest
+};
 
 class Communication
 {
-  private:
-    int baudRate;
-    int port;
-    int readByte;
-    char receivedChar;
-    bool command;
-    String msg;
- 
-    String _format(String message);//Function tested
-    COMMANDS checkProtocol();
-
   public:
-    Communication(uint8_t port, uint32_t baudrate);
-    void Begin();
-    COMMANDS readSerialPort();
-    uint8_t sendMessage(String message);
+
+    virtual void Begin() = 0;
+    virtual COMMANDS readCommand(int id) = 0;
+    virtual int sendCommand(int id, String message) = 0;
+
+    String _format(String message);
+    COMMANDS checkProtocol(String message);
 };
 
