@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "Communication.h"
 
-#define OldOrNew 2
+#define OldOrNew 1
 
 class UART : public Communication
 {

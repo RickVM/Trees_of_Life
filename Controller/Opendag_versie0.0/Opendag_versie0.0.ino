@@ -28,8 +28,8 @@
 //Defines
 #define INPUT_METHOD 2// 1 for buttons, two for 
 #define COMMUNICATION_METHOD 1 // 1 for serial, 2 for i2c
-#define NUM_ANIMATORS 6
-#define NUM_INPUTS 6
+#define NUM_ANIMATORS 2
+#define NUM_INPUTS 2 
 #define ID 0
 
 //Objects
@@ -37,12 +37,11 @@ Input* input;
 Controller* c;
 
 //Input arrays
-uint8_t inputsArray[6] = {23, 21, 19, 17, 15, 12};//Change the numbers, but DO NOT DELETE THIS ARRAY, echo, Rood kabel en blauw tape, of groen
-uint8_t triggerArray[6] = {22, 20, 18, 16, 14, 11};//zwart kabel en wit tape, of groen
+uint8_t inputsArray[6] = {14, 16, 19, 17, 15, 12};//Change the numbers, but DO NOT DELETE THIS ARRAY, echo, Rood kabel en blauw tape, of groen
+uint8_t triggerArray[6] = {15, 17, 18, 16, 14, 11};//zwart kabel en wit tape, of groen
 
 void setup()
 {
-  delay(10);
   Serial.begin(9600);//Just for debugging.
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);

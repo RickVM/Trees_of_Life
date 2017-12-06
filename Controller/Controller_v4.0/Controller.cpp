@@ -8,7 +8,8 @@
 
 #define SYNC_DELAY 1000
 #define PULSE_TIME 2500
-#define CYCLES 5
+#define CYCLES 0
+#define NUMBER_OF_HANDS_TO_SYNC 3
 
 /*
    Controller constructor
@@ -17,13 +18,14 @@
    Expects the amount of animators (slaves) that it controlles
    And expect and id that is needed for communication over the I2C bus
 */
-Controller::Controller(Input* input, int comMethod, int numAnimators, int id)
+Controller::Controller(Input* input, int comMethod, int numAnimators, int id, int numInputs)
 {
   this->_input = input;
   this->communicationMethod = comMethod;
   this->numberAnimators = numAnimators;
-  this->syncPreset = 15000;
+  this->syncPreset = 10000;//Hoelang tot een nieuwe flash
   this->id = id;
+  this->numberInputs = numInputs;
 }
 
 /*
@@ -96,9 +98,11 @@ void Controller::Logic(void)
 void Controller::syncingFailedLogic(void)
 {
   this->LetGo();
-  delay(10000);
   syncingFailed = false;
   this->Reset();
+  Serial.println("Start desyn");
+  delay(1000);
+  Serial.println("Stopping desync");
 }
 
 /*
@@ -179,6 +183,8 @@ void Controller::syncLogic(void)
     //Execute sync
     this->countLetGo = 0;
     this->syncTime = millis();
+    //NUMBER_OF_HANDS_TO_SYNC set sensors twee high
+    //_input->fix();
     //Check if sync is complete
     if (this->syncTime - this->oldSyncTime >= this->syncPreset)
     {
@@ -197,15 +203,15 @@ void Controller::syncLogic(void)
 void Controller::calculateAdjustments(void)
 {
   long average = 0;
-  for (int i = 0; i < this->numberAnimators; i++)
+  for (int i = 0; i < this->numberInputs; i++)
   {
     average += oldTime[i];
   }
-  average /= this->numberAnimators;
-  for (int k = 0; k < this->numberAnimators; k++)
+  average /= this->numberInputs;
+  for (int k = 0; k < this->numberInputs; k++)
   {
     adjustmentTimes[k] = average - oldTime[k];
-    adjustmentSteps[k] = adjustmentTimes[k] / 10;
+    adjustmentSteps[k] = adjustmentTimes[k] / 3;
     pulseTime[k] += adjustmentSteps[k];
   }
 }
@@ -214,20 +220,20 @@ bool Controller::checkLetGo()
 {
   bool rv = false;
   int temp = 0;
-  for (int i = 0; i < this->numberAnimators; i++)
+  for (int i = 0; i < this->numberInputs; i++)
   {
     temp += _input->getInputHigh(i);
   }
-  if (temp < numberAnimators)
+  if (temp < NUMBER_OF_HANDS_TO_SYNC)
   {
     delay(150);
     _input->readInputs();//Read the inputs again
     temp = 0;
-    for (int i = 0; i < this->numberAnimators; i++)
+    for (int i = 0; i < this->numberInputs; i++)
     {
       temp += _input->getInputHigh(i);
     }
-    if (temp < this->numberAnimators)
+    if (temp < NUMBER_OF_HANDS_TO_SYNC)
     {
       rv = true;
     }
@@ -239,20 +245,20 @@ bool Controller::checkSync()
 {
   bool rv = false;
   int temp = 0;
-  for (int i = 0; i < this->numberAnimators; i++)
+  for (int i = 0; i < this->numberInputs; i++)
   {
     temp += _input->getInputHigh(i);
   }
-  if (temp == this->numberAnimators)
+  if (temp >= NUMBER_OF_HANDS_TO_SYNC)
   {
     delay(25);
     _input->readInputs();
     temp = 0;
-    for (int i = 0; i < this->numberAnimators; i++)
+    for (int i = 0; i < this->numberInputs; i++)
     {
       temp += _input->getInputHigh(i);
     }
-    if (temp == this->numberAnimators)
+    if (temp >= NUMBER_OF_HANDS_TO_SYNC)
     {
       rv = true;
     }
@@ -301,7 +307,7 @@ void Controller::syncStop(void)
 void Controller::Pulse(void)//Two inputs at the moment
 {
   this->syncStop();
-  for (int i = 0; i < this->numberAnimators; i++)
+  for (int i = 0; i < this->numberInputs; i++)
   {
     if (_input->getInputHigh(i))
     {
@@ -347,9 +353,8 @@ void Controller::Pulse(void)//Two inputs at the moment
 
 void Controller::LetGo(void)
 {
-  COM->sendCommand(1, "backward");//Teensy 1
-  COM->sendCommand(3, "backward");//Teensy 2
-  COM->sendCommand(5, "backward");//Teensy 3
+  //Send to all three teeny's with special fucntion.
+  COM->sendToAll("backward");
   /*for (int i = 1; i <= this->numberAnimators; i++)
     {
     COM->sendCommand(i, "backward");
@@ -358,10 +363,9 @@ void Controller::LetGo(void)
 
 void Controller::Flash(void)
 {
-  //Send to all three teensy's
-  COM->sendCommand(1, "flash");//Teensy 1
-  COM->sendCommand(3, "flash");//Teensy 2
-  COM->sendCommand(5, "flash");//Teensy 3
+  //Send to all three teensy's, via special function.
+  Serial.println("Sending flash ");
+  COM->sendToAll("flash");
   /*
     for (int i = 1; i <= this->numberAnimators; i++)
     {

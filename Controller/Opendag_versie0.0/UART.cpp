@@ -104,12 +104,18 @@ int UART::sendCommand(int id, String message)
       switch (id) {
         case 1:
           Serial1.println(_format(message));
+          Serial.print("Sende message to teensy 1: ");
+          Serial.println(message);
           break;
         case 2:
           Serial2.println(_format(message));
+          Serial.print("Sende message to teensy 2: ");
+          Serial.println(message);
           break;
         case 3:
           Serial3.println(_format(message));
+          Serial.print("Sende message to teensy 3: ");
+          Serial.println(message);
           break;
         default:
           rv = -1;

@@ -100,3 +100,9 @@ void receiveEvent(int howMany)
   }
 }
 
+int I2C::sendToAll(String message)
+{
+  //Not inplemented.
+  return -1;
+}
+

@@ -8,7 +8,7 @@ class Button : public Input
 {
   private:
     uint8_t* arrayinputs;//Pointer to an global array, tested
-//    Bounce buttons[6];
+    //  Bounce buttons[6];
 
   public:
     //Constructor sets the number of intputs and which pins that can be found as a global array.

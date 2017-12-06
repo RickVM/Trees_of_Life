@@ -99,6 +99,7 @@ int UART::sendCommand(int id, String message)
 {
   int rv = 0;
   String tempMessage = "";
+  int teensyNumber = -1;
   switch (OldOrNew) {
     case 1: //Old
       switch (id) {
@@ -124,54 +125,42 @@ int UART::sendCommand(int id, String message)
           tempMessage = "1";
           tempMessage.concat(message);
           Serial1.println(_format(tempMessage));
-          Serial.print("Sended = ");
-          Serial.print(tempMessage);
-          Serial.println(" to teensy 1.");
+          teensyNumber = 1;
           break;
         case 2:
           //Send to teensy 1
           tempMessage = "2";
           tempMessage.concat(message);
           Serial1.println(_format(tempMessage));
-          Serial.print("Sended = ");
-          Serial.print(tempMessage);
-          Serial.println(" to teensy 1.");
+          teensyNumber = 1;
           break;
         case 3:
           //Send to teensy 2
           tempMessage = "1";
           tempMessage.concat(message);
           Serial2.println(_format(tempMessage));
-          Serial.print("Sended = ");
-          Serial.print(tempMessage);
-          Serial.println(" to teensy 2.");
+          teensyNumber = 2;
           break;
         case 4:
           //Send to teensy 2
           tempMessage = "2";
           tempMessage.concat(message);
           Serial2.println(_format(tempMessage));
-          Serial.print("Sended = ");
-          Serial.print(tempMessage);
-          Serial.println(" to teensy 2.");
+          teensyNumber = 2;
           break;
         case 5:
           //Send to teensy 3
           tempMessage = "1";
           tempMessage.concat(message);
           Serial3.println(_format(tempMessage));
-          Serial.print("Sended = ");
-          Serial.print(tempMessage);
-          Serial.println(" to teensy 3.");
+          teensyNumber = 3;
           break;
         case 6:
           //Send to teensy 3
           tempMessage = "2";
           tempMessage.concat(message);
           Serial3.println(_format(tempMessage));
-          Serial.print("Sended = ");
-          Serial.print(tempMessage);
-          Serial.println(" to teensy 3.");
+          teensyNumber = 3;
           break;
         default:
           //Not inplemented
@@ -182,6 +171,29 @@ int UART::sendCommand(int id, String message)
       //Not inplemented
       break;
   }
-  
+  Serial.print("Sended = ");
+  Serial.print(tempMessage);
+  Serial.print(" to teensy ");
+  Serial.println(teensyNumber);
   return rv;
 }
+
+/*
+   Function to send one command to all teensy's
+   these commands are special commands and are always lead by a zero.
+*/
+int UART::sendToAll(String message)
+{
+  int rv = 0;
+  String tempMessage = "0";
+  tempMessage.concat(message);
+  tempMessage = _format(tempMessage);
+  Serial1.println(tempMessage);
+  Serial2.println(tempMessage);
+  Serial3.println(tempMessage);
+  Serial.print("Sended : ");
+  Serial.print(message);
+  Serial.println(" to all teensy's.");
+  return rv;
+}
+

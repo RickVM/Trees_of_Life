@@ -34,7 +34,7 @@ void Button::readInputs()
   {
     this->setInput(i, digitalRead(this->arrayinputs[i]));
   }*/
-/*  for (int i = 0; i < this->numInputs; i++)
+  /*for (int i = 0; i < this->numInputs; i++)
   {
     buttons[i].update();
     this->setInput(i, buttons[i].read());

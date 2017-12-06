@@ -19,5 +19,6 @@ class UART : public Communication
     void Begin();
     COMMANDS readCommand(int id);
     int sendCommand( int id, String message);
+    int sendToAll(String message);
 };
 
