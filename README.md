@@ -1,88 +1,45 @@
-# Project Title
+# Trees of life
 
-One Paragraph of project description goes here
+Trees of life is a created for GLOW 2017.
 
-## Getting Started
+Every year in November, Eindhoven will be all about Light Art Festival GLOW. This year for the 12th time, from 11 until 18 November. 
+An enormous exhibition in public space of 30 famous national and international light artists. 
+The light artworks are connected by a walking route of approximately 6 kilometres which runs through the city centre. 
+Besides the light art projects and numerous side-events there are also innovative, unique works of art that are created by young talents that will be exhibited at the industrial NRE site at the main route. 
+The year's theme is called 'The Source'. All artists were instructed to create a project based on his theme which already results in a surprising variety of light artworks.
+The festival is accessible for free.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+‘Trees of Life’ connects this city’s green urban nature with Eindhoven’s second nature of Technology and Design. 
+It visualizes the relationship between humans and nature. Visitors will connect with both nature's of Eindhoven trough interaction with the tree.
+Through interacting and cooperating with other visitors the connection becomes a bond between humans and the city.
+The final installation existed out of two trees that each are controlled and powered separately. 
+On each of the trees are "hands" (points of interaction), each one holds an ultrasonic sensor. 
+With this sensor we measure the distance of a visitors hand. The better a visitor touched the tree the more energy was given off. 
+When enough energy is given to the tree it will start to sync it's animations. 
+After a long enough time of cooperation the tree will come alive with an animation that resembles the beating of a hearth.
 
-### Prerequisites
+## Getting it up and running
 
-What things you need to install the software and how to install them
+Clone the project or download the zip file and extract it. 
+The project exist out of a "Controller" that commands each slave (Animator) when to do a pulse.
+For this you need a minimum of two [teensy 3.2](https://www.pjrc.com/teensy/teensy31.html) with [Octows2811 adaptors](https://www.pjrc.com/store/octo28_adaptor.html). 
+The communication is written to be able to communicate with three slaves via serial or 7+ (tested) by IIC. 
 
-```
-Give examples
-```
+The following libraries are needed to be able to use the programs:
+* [Fastled](https://github.com/FastLED/FastLED)
+* [Linked list](https://github.com/ivanseidel/LinkedList)
 
-### Installing
+Also needed is [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html) to be able to upload to the teensies.
 
-A step by step series of examples that tell you have to get a development env running
+## Extra
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+If you want to see the project in action see -> [Playlist Trees of Life](https://www.youtube.com/watch?v=enf7rqlMsUA&list=PLnrOIvNf58VsxmiSHGhlQPTVBx3L89DvG).
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Rick van Melis** - *Development* - [Portfolio](www.rickvanmelis.nl)
+* **Simon Lit** - *Development* - [Portfolio](www.simonlit.nl)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
-
+This project is licensed under the Apache 2.0 License - see the [LICENSE.md](LICENSE.md) file for details
