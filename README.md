@@ -37,8 +37,8 @@ If you want to see the project in action see -> [Playlist Trees of Life](https:/
 
 ## Authors
 
-* **Rick van Melis** - *Development* - [Portfolio](https://www.rickvanmelis.nl)
-* **Simon Lit** - *Development* - [Portfolio](https://www.simonlit.nl)
+* **Rick van Melis** - *Development* - [Portfolio](http://www.rickvanmelis.nl>)
+* **Simon Lit** - *Development* - [Portfolio](http://www.simonlit.nl>)
 
 ## License
 
