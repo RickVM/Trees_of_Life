@@ -1,5 +1,10 @@
 /*
       Author: Rick van Melis & Simon Lit
+      Animator software for trees of life
+      Each animator handles the animation for 2 hands consisting of 2 arteries which each consist of 1-2 led strips depending upon the length of 5 or 7,5m.
+      So in total the animator handles 4-8 led-strips.
+      Specifics depend upon the physical controller, which is defined in PinoutSettings.h
+
 */
 
 #include "FastLED.h"
@@ -27,8 +32,6 @@ enum globalState {
   Desynchronized
 } GlobalState;
 
-
-
 Hand* hand1;
 Hand* hand2;
 Hand* hands[2];
@@ -37,10 +40,13 @@ Hand* activeHand = NULL;
 ledstrip Strip1;
 ledstrip Strip2;
 ledstrip Strip3;
-ledstrip Strip4; //Change this when adjusting the nr of ledstrips!
-ledstrip* strips[] = {&Strip1, &Strip2, &Strip3, &Strip4}; //This also!
+ledstrip Strip4;
+ledstrip* strips[] = {&Strip1, &Strip2, &Strip3, &Strip4};
 
 long randomPulseTime = 2500;
+long lastUpdate = 0;
+long lastTestPulseTime = 0;
+long lastFlash = 0;
 
 void setupHands() {
   //constructor: Hand(ledstrip* Strips[], int NrOfStrips);
@@ -50,11 +56,6 @@ void setupHands() {
   hands[1] = hand2;
   Serial.println("Finished setting up hands");
 }
-
-long lastUpdate = 0;
-long lastTestPulseTime = 0;
-long lastFlash = 0;
-
 
 void executeState() {
   Serial.print("Executing state:\t");
@@ -81,7 +82,7 @@ void executeState() {
     case Desynchronized:
       Serial.println("Desynchronized");
       unsigned long startTime = millis();
-      while ((desyncTime + startTime)  > millis()) {
+      while ((desyncTime + startTime)  > millis()) { //Blocking function here, might want to fix this proper
         for (int i = 0; i < NUM_STRIPS_TOTAL; i++) {
           fadeToBlackBy(strips[i]->leds, strips[i]->nrOfLeds, FALL_FADER);
         }
@@ -96,6 +97,7 @@ void executeState() {
   }
 }
 
+//Handles received input from master
 void readInput() {
   COMMANDS x = COM->readCommand(ID);
   //Get hand, return int for wich hand
@@ -159,6 +161,32 @@ void readInput() {
   }
 }
 
+//Triggers a pulse every 1500-4500 seconds
+void TestPulses() {
+  long Time = millis();
+
+  if ((lastTestPulseTime + randomPulseTime ) < Time)
+  {
+    //int strip = random(0, 1);
+    Serial.println("Making test pulse");
+    for (int i = 0; i < NUM_HANDS; i++) {
+      hands[i]->makePulses(1);
+    }
+    randomPulseTime = random(1500, 4500);
+    lastTestPulseTime = Time;
+  }
+}
+
+//Checks if the tree needs to enter flash mode depending on the time passed.
+void checkFakeFlash() {
+  long Time = millis();
+  if (Time > lastFlash + fakeFlashTime) {
+    GlobalState = Synchronized;
+    lastFlash = Time;
+  }
+}
+
+//Setup is done based upon controller and tree data from PinoutSettings.h
 void setupLedStrips() {
   Serial.println("Setting up led strips");
 
@@ -191,6 +219,7 @@ void setupLedStrips() {
   FastLED.addLeds<WS2811, DATA6_PIN, HAND21BTYPE>(strips[2]->leds, NUM_LEDS_3A, NUM_LEDS_3B).setCorrection(TypicalLEDStrip);
 
   //Couple 4
+  //Tree 1 controller 3 had a malfunctioning wire, hence the wires are switched here.
   if (TREE == 1) {
     if (CONTROLLER == 3) {
       //Controller 3 has physically switched data pins.
@@ -198,6 +227,7 @@ void setupLedStrips() {
       FastLED.addLeds<WS2811, DATA7_PIN, HAND22BTYPE>(strips[3]->leds, NUM_LEDS_4A, NUM_LEDS_4B).setCorrection(TypicalLEDStrip);
     }
   }
+  //Regular setup
   else {
     FastLED.addLeds<WS2811, DATA7_PIN, HAND22ATYPE>(strips[3]->leds, 0, NUM_LEDS_4A).setCorrection(TypicalLEDStrip);
     FastLED.addLeds<WS2811, DATA8_PIN, HAND22BTYPE>(strips[3]->leds, NUM_LEDS_4A, NUM_LEDS_4B).setCorrection(TypicalLEDStrip);
@@ -240,36 +270,6 @@ void setup() {
   Serial.println("Startup complete.");
 }
 
-void TestPulses() {
-  long Time = millis();
-
-  if ((lastTestPulseTime + randomPulseTime ) < Time)
-  {
-    //int strip = random(0, 1);
-    Serial.println("Making test pulse");
-    for (int i = 0; i < NUM_HANDS; i++) {
-      hands[i]->makePulses(1);
-    }
-    randomPulseTime = random(1500, 4500);
-    lastTestPulseTime = Time;
-  }
-}
-
-void testLength() {
-  for (int i = 100; i >= 3; i--) {
-    for (int j = 0; j < NUM_STRIPS_TOTAL; j++)
-      strips[j]->leds[i] = CHSV(225, 225, 225);
-  }
-  FastLED.show();
-  Serial.println("test complete");
-}
-void checkFakeFlash() {
-  long Time = millis();
-  if (Time > lastFlash + fakeFlashTime) {
-    GlobalState = Synchronized;
-    lastFlash = Time;
-  }
-}
 
 void loop() {
   if (testMode)

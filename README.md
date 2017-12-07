@@ -1,8 +1,8 @@
 # Trees of life
 
-Trees of life is a created for GLOW 2017.
+Trees of life was created for GLOW 2017.
 
-Every year in November, Eindhoven will be all about Light Art Festival GLOW. This year for the 12th time, from 11 until 18 November. 
+Every year in November, Eindhoven is all about the Light Art Festival GLOW. This year glow will be hosted for the 12th time, from 11 until 18 November 2017. 
 An enormous exhibition in public space of 30 famous national and international light artists. 
 The light artworks are connected by a walking route of approximately 6 kilometres which runs through the city centre. 
 Besides the light art projects and numerous side-events there are also innovative, unique works of art that are created by young talents that will be exhibited at the industrial NRE site at the main route. 

@@ -14,6 +14,7 @@ Hand::Hand(ledstrip* Strip1, ledstrip* Strip2, int NrOfStrips)
   Serial.println("Constructed a hand");
 }
 
+//makes a pulse for both arteries (Led-strips connected to the hand)
 void Hand::makePulses(double intensity) {
   Serial.println("Makepulses");
   Serial.print("State before doing something:\t");
@@ -34,6 +35,7 @@ void Hand::makePulses(double intensity) {
   }
 }
 
+//Triggers makeRestPulse every RestPulseTime seconds.
 void Hand::fakeRestPulse() { //For test purposes
   long currentTime = millis();
   Serial.println("Checking if we should fake");
@@ -45,10 +47,12 @@ void Hand::fakeRestPulse() { //For test purposes
   }
 }
 
+//Update tick for restpulses
+//Auomatically deletes respulse when complete
 void Hand::doRestPulse() {
   for (int i = 0; i < RestPulses.size(); i++) {
     Serial.println("Doing a rest pulse");
-    if (RestPulses.get(i)->tickRestWave()) {
+    if (RestPulses.get(i)->tickRestWave()) { //False means the pulse is finished
     }
     else {
       deleteRestPulse(i);
@@ -56,7 +60,7 @@ void Hand::doRestPulse() {
   }
 }
 
-//Makes a new pulse for the strip
+//Makes a new RestPulse for the strip
 void Hand::makeRestPulse(int strip) {
   Serial.println("Making a rest pulse");
   int IndexNumber = random(0, strips[strip]->nrOfLeds);
@@ -77,7 +81,7 @@ void Hand::doPulse() {
   Serial.println("Entered dopulse");
   for (int i = 0; i < Pulses.size(); i++) {
       Serial.println("Doing a pulse tick");
-    if (Pulses.get(i)->tickSawWave()) { //tickSawWave
+    if (Pulses.get(i)->tickSawWave()) { //False means pulse is finished, upon true its ongoing
     }
     else {
       deletePulse(i);
@@ -85,7 +89,7 @@ void Hand::doPulse() {
   }
 }
 
-//Collapse a pulse backwards
+//Collapse all pulses downwards
 //Used for 'desync'
 void Hand::collapsePulse() {
   for (int i = 0; i < Pulses.size(); i++) {
@@ -108,6 +112,7 @@ void Hand::makePulse(int strip, double intensity) {
   Serial.println("Pulse made");
 }
 
+//Deletes all pulses
 void Hand::deletePulses() {
   int Size = Pulses.size();
   Serial.print("Pulses size:  ");
@@ -125,6 +130,7 @@ void Hand::deletePulse(int i) {
   P = NULL;
 }
 
+//Handles hand state
 void Hand::executeState() {
   Serial.print("Executing hand-state: \t");
   Serial.print(currentState);
@@ -132,7 +138,7 @@ void Hand::executeState() {
     case Rest:
       Serial.println("Rest");
       pulseFade();
-      fakeRestPulse(); //For test purposes
+      fakeRestPulse(); //Should have been handled by master but this was not implemented so we fake it randomly
       doRestPulse();
       break;
     case Pulsing:

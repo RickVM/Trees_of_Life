@@ -22,7 +22,7 @@ class Hand {
 
     void deletePulse(int i);//Deletes a pulse at the given index from the pulses list
     void deleteRestPulse(int i); //Deletes a pulse at the given index from the pulses list
-    void makeRestPulse(int strip);
+    void makeRestPulse(int strip); //Makes a new RestPulse for the strip
     void pulseFade(); //Fades active strips
     void makePulse(int strip, double intensity); //Makes a new pulse for the strip
     void doPulse(); //Does a tick for all regular pulses and deletes finished ones.
@@ -37,9 +37,6 @@ class Hand {
     void collapsePulse();//Collapse a pulse backwards
     void makePulses(double intensity); //Makes a pulse for all strips in the hand
     void deletePulses() ; //Delete all pulses
-
-    //Triggers makepulse every pulseTime seconds
-    //Used for automatic testing purposes
     void Test();
 
 

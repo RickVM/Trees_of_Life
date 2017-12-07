@@ -4,6 +4,7 @@
 #include <FastLED.h>
 
 //These should be in the class, but wont work if done so.
+//Used by tickCustomWave
 const int bigWaveBrightness[] = {5, 5, 10, 15, 20, 25, 30, 35, 40, 45, 52, 59, 68, 76, 85, 95, 100, 95, 60, 40, 30, 25, 20, 19, 18, 17, 16, 15, 14, 13, 10};
 const int smallWaveBrightness[] = {3, 3, 5, 8, 10, 13, 15, 18, 20, 23, 26, 30, 34, 38, 43, 8, 50, 48, 30, 20, 15, 13, 10, 10, 9, 9, 8, 8, 7, 7, 5 };
 extern bool stripTypeNew;
@@ -53,9 +54,9 @@ class Pulse {
     Pulse(CRGB* StripLeds, int Num_leds, int Hue, double intensity);
 
     Pulse(CRGB* StripLeds, int Num_leds, int Hue, int customIndex);
-    bool tick();
-    bool tickCustomWave();
-    bool tickSawWave();
+    bool tick(); //Old function, basic animation
+    bool tickCustomWave(); //Has a bug 
+    bool tickSawWave(); //Used in program
     bool tickRestWave();
-    bool fall();
+    bool fall(); //Collapses the pulse
 };

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "PinoutSettings.h"
+
+//Colors vary based upon tree
 #if TREE == 1
 #define pulseHue 40
 #define restPulseHue 90
@@ -19,7 +21,7 @@
 #endif
 
 
-#define BRIGHTNESS  125 //200
+#define BRIGHTNESS  125
 #define FRAMES_PER_SECOND  40
 #define FADER 40
 #define PULSEFADER 40
